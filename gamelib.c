@@ -13,10 +13,12 @@
 //static void esci();
 //static void printftext(char* text);
 /**
- * controls whether the head pointers are null
- * and calls a function to create the linked list
+ * creates the two structures
+ * @param fisrt takes the head node of the linked list
+ * @param last takes the last node of the linked list
+ * @param t stores the users choice
 */
-static void ins_caverna();
+static void ins_caverna(Cave_t* first, Cave_t* last, int t);
 //static Cave_t* canc_caverna(Cave_t* cave, int t);//to delete the last node inserted
 //static Cave_t* create(Cave_t* cave, int t);//to create a new node each time we want to insert a node to the list
 //static Cave_t* append(Cave_t* cave, int t);//adds a node at the end of the linked list
@@ -28,22 +30,19 @@ static void ins_caverna();
 */
 static void print(Cave_t* cave);
 /**
- * outputs the linked list
- * @param cave takes the linked list 
-*/
-static Cave_t* add(Cave_t* cave);
-/**
  * to check if creating map is done
 */
 static int control = 0;
 /**
-*points to the first node of the arvais linked list
+*pointers to the first and last node of the arvais linked list
 */
 static Cave_t* head_arvais = NULL;
+static Cave_t* last_arvais = NULL;
 /**
-*points to the first node of the hartornen linked list
+*pointers to the first and last node of the hartornen linked list
 */
 static Cave_t* head_hartornen = NULL;
+static Cave_t* last_hartornen = NULL;
 /**
 *seed for generating random numbers
 */
@@ -96,9 +95,27 @@ void MainMenu(int *check){
     
 
     switch (choice){
-    case 1:
-            ins_caverna();
-            //crea_cunicolo();
+    case 1:{
+            int counter = 0;
+            do{
+                printf("faccciamo i cunicoli per la famiglia Arvais\ndove vuoi inserire i cunicoli?\n");
+                int c;
+                scanf("%d", &c);
+                head_arvais->scelta[counter] = c; 
+                ins_caverna(head_arvais, last_arvais, c);
+                counter++;
+            }while(counter <= 9);
+            
+            counter = 0;
+            do{
+                printf("faccciamo i cunicoli per la famiglia Hartornen\ndove vuoi inserire i cunicoli?\n");
+                int c;
+                scanf("%d", &c);
+                head_hartornen->scelta[counter] = c; 
+                ins_caverna(head_hartornen, last_hartornen, c);
+                counter++;
+            }while(counter <= 9);
+        }
         break;
     case 2:
             printf("arvais\n");
@@ -121,69 +138,43 @@ static void crea_cunicolo(){
 
 }*/
 
-static void ins_caverna(){
-    //head_arvais = (Cave_t*)malloc(sizeof(Cave_t));
-   //head_hartornen = (Cave_t*)malloc(sizeof(Cave_t));
-    //famiglia arvais
-
-        head_arvais = add(head_arvais);
-
-    
-    //famiglia hartornen
-
-        head_hartornen = add(head_arvais);
-    control = 1;
-}
-
-static Cave_t* add(Cave_t* cave){
-    Cave_t* new_node = cave;
-    Cave_t* tmp;
-    for(int i = 0; i <=10 ; i++){
-        new_node = (Cave_t*)malloc(sizeof(Cave_t));
-        printf("FACCIAMO I CUNICOLI\n");
-        printf("puoi inserire i cunicoli scegliendo uno delle tre direzioni\n");
-        printf("\t1- AVANTI\n\t2- SINISTRA\n\t3- DESTRA\n\n");
-        int p;
-        scanf("%d", &p);
-        
-        if(p == 1){     
-            if(r < 20){
-                new_node->melassa = 2;
-            }else if(r >=20 && r < 50){
-                        new_node->melassa = 1;
-            }else if(r >= 50){
-                        new_node->melassa = 0;
-            }
-            new_node->avanti = NULL;
-            tmp->avanti = new_node;
-            new_node = tmp->avanti;
-        }else if(p == 2){
-                if(r < 20){
-                    new_node->melassa = 2;
-                }else if(r >=20 && r < 50){
-                        new_node->melassa = 1;
-                }else if(r >= 50){
-                       new_node->melassa = 0;
-                }
-                new_node->sinistra= NULL;
-                tmp->sinistra = new_node;
-                new_node = tmp->sinistra;
-            }else if(p == 3){
-                    if(r < 20){
-                        new_node->melassa = 2;
-                    }else if(r>=20 && r < 50){
-                        new_node->melassa = 1;
-                    }else if(r >= 50){
-                        new_node->melassa = 0;
-                    }
-                    new_node->avanti = NULL;
-                    tmp->destra = new_node;
-                    new_node = tmp->destra;
-
-            }
-            new_node->scelta[i] = p;
+static void ins_caverna(Cave_t* first, Cave_t* last, int t){
+    Cave_t* new = (Cave_t*)malloc(sizeof(Cave_t));
+        if(t == 1){
+        new->avanti = NULL;
+        if(first == NULL){
+            first = (Cave_t*)malloc(sizeof(Cave_t));
+            last = (Cave_t*)malloc(sizeof(Cave_t));
+            first  = new;
+            last = new;
+        }else{
+            last->avanti = new;
+            last = new;
         }
-    return new_node;
+    }else if(t == 2){
+        new->sinistra = NULL;
+        if(first == NULL){
+            first = (Cave_t*)malloc(sizeof(Cave_t));
+            last = (Cave_t*)malloc(sizeof(Cave_t));
+            first = new;
+            last = new;
+        }else{
+            last->sinistra = new;
+            last = new;
+        }
+    }else if(t == 3){
+        new->destra = NULL;
+        if(first == NULL){
+            first = (Cave_t*)malloc(sizeof(Cave_t));
+            last = (Cave_t*)malloc(sizeof(Cave_t));
+            first = new;
+            last = new;
+        }else{
+            last->destra = new;
+            last = new;
+        }
+    }
+    control = 1;
 }
 
 void print(Cave_t* cave){
