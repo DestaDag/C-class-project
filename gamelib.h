@@ -18,6 +18,10 @@ void MainMenu(int *check);
 //! debug void termina_gioco();
 //! debug void gioca();
 
+#define KNRM  "\x1B[0m"
+#define KYEL  "\x1B[33m"
+#define KRED  "\x1B[31m"
+
 enum Tipo_imprevisto {
     nessun_imprevisto,
     crollo,
