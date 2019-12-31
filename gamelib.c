@@ -45,7 +45,6 @@ static Cave_t* last_hartornen = NULL;
 /**
 *seed for generating random numbers
 */
-
 #define r rand()%101
 //! debug static Scava_t arvais;
 //! debug static Scava_t hartornen;
@@ -83,53 +82,85 @@ static void printftext(char* text){
 
 void MainMenu(int *check){
     int choice = 0;
-    
-     //   FILE *txt;
-      //  txt = fopen("test.txt", "r");
-      //  fprintf("%s",txt);
-        system("clear");
-        printf(KNRM"--------MAIN-MENU--------\n");
-        printf(KNRM"\t"KRED"1-"KNRM" CREA CUNICOLI\n\t"KRED"2-"KNRM" GIOCA\n\t"KRED"3-"KNRM" TERMINA GIOCO\n"KYEL"$ ");
-        scanf("%d", &choice);
+    int p;
+    FILE *file;
+    system("clear");
+    printf(KRED"\t\t\n\n");
+    system("clear");
+    file = fopen("test.txt", "r");
+    if (file) {
+        while ((p = getc(file)) != EOF)
+            putchar(p);
+        fclose(file);
+    }
+    system("clear");
+    printf(KMAG"--------MAIN-MENU--------\n");
+    printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" STAMPA CUNICOLI\n\t"KRED"3-"KBLU" GIOCA\n\t"KRED"4-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
+    scanf("%d", &choice);
     
 
     switch (choice){
     case 1:{
-            int counter = 0;
+            int counter = 1;
+            printf(KGRN"i cunicoli per entrambe le famiglie saranno dieci\n");
             do{
-                printf(KNRM"\tfaccciamo i cunicoli per la famiglia Arvais\n\tdove vuoi inserire i cunicoli?\n"KYEL"$ ");
+                printf(KGRN"\nfaccciamo i cunicoli per la famiglia Arvais:\ndove vuoi inserire il %d cunicolo?\n", counter);
+                printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n");                
+                printf(KYEL"$ ");
+                
+                
                 int c;
                 do{
                     scanf("%d", &c);
+                    if(c != 1 && c != 2 && c != 3)
+                        if(r <= 50){
+                            printf(KRED"input sbagliato, riprova\n"KYEL"$ ");
+                            
+                        }else{
+                            printf(KRED"gli input devono essere '1' o '2' o '3'\n"KYEL"$ ");
+                         
+                         }
                 }while(c != 1 && c != 2 && c != 3);
                 bool f = true;
                 ins_caverna(c, f);
-                head_arvais->scelta[counter] = c;
+                //head_arvais->scelta[counter] = c;
                 counter++;
-            }while(counter <= 9);
+            }while(counter <= 10);
             
-            counter = 0;
+            counter = 1;
             do{
-                printf(KNRM"\tfaccciamo i cunicoli per la famiglia Hartornen\n\tdove vuoi inserire i cunicoli?\n"KYEL"$ ");
+                printf(KGRN"\nfaccciamo i cunicoli per la famiglia Hartornen:\ndove vuoi inserire il %d cunicolo?\n", counter);
+                printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n"); 
+                printf(KYEL"$ ");
+                
                 int c;
                 do{
                     scanf("%d", &c);
+                    if(c != 1 && c != 2 && c != 3)
+                        if(r <= 50){
+                            printf(KRED"input sbagliato, riprova\n"KYEL"$ ");
+                            
+                        }else{
+                            printf(KRED"gli input devono essere '1' o '2' o '3', riprova\n"KYEL"$ ");
+        
+                        }
                 }while(c != 1 && c != 2 && c != 3);
                 
                 
                 bool g = false;
                 ins_caverna(c, g);
-                head_hartornen->scelta[counter] = c;
+                //head_hartornen->scelta[counter] = c;
                 counter++;
-            }while(counter <= 9);
+            }while(counter <= 10);
         }
         break;
-    case 2:
+    case 2:{   
             printf("arvais\n");
             print(last_arvais);
             printf("\n\nhartornen\n");
-            print(last_hartornen);
+            print(head_hartornen);
             *check  = 1;
+        }
         break;
     case 3:
             printf("hello world");
@@ -147,6 +178,16 @@ static void crea_cunicolo(){
 
 static void ins_caverna(int t, bool b){
     Cave_t* new = (Cave_t*)malloc(sizeof(Cave_t));
+   // int i = 0;
+   /* do{
+        new->scelta[i] = t;
+    i++;
+    } while (i <= 9);*/
+    
+
+    new->avanti = NULL;
+    new->sinistra = NULL;
+    new->destra = NULL;
     if(r <= 50){
         new->melassa = 0; 
     }else if(r > 51 && r <= 70){
@@ -161,67 +202,39 @@ static void ins_caverna(int t, bool b){
     }else if(r > 86 && r <= 100){
         new->stato = 3;
     }
-    new->avanti = NULL;
-    new->sinistra = NULL;
-    new->destra = NULL;
     if(b == true){
-        if(t == 1){
-            //new->avanti = NULL;
-            if(head_arvais == NULL){
-                head_arvais = new;
-                last_arvais = new;
-            }else{
+        if(head_arvais == NULL){
+            head_arvais = new;
+            last_arvais = new;
+        }else{        
+            if(t == 1){
                 last_arvais->avanti = new;
-                last_arvais = new;
-            }
-        }else if(t == 2){
-            //new->sinistra = NULL;
-            if(head_arvais == NULL){
-                head_arvais = new;
-                last_arvais = new;
-            }else{
+                last_arvais = new;    
+            }else if(t == 2){
                 last_arvais->sinistra = new;
                 last_arvais = new;
-            }
             }else if(t == 3){
-                //new->destra = NULL;
-                if(head_arvais == NULL){
-                    head_arvais = new;
-                    last_arvais = new;
-                }else{
-                    last_arvais->destra = new;
-                    last_arvais = new;
-                }
+                last_arvais->destra = new;
+                last_arvais = new;        
             }  
-    }else if(b == false){
-        if(t == 1){
-            //new->avanti = NULL;
-            if(head_hartornen == NULL){
-                head_hartornen = new;
-                last_hartornen = new;
-        }else{
-            last_hartornen->avanti = new;
-            last_hartornen = new;
         }
-        }else if(t == 2){
-            //new->sinistra = NULL;
+    }else if(b == false){
             if(head_hartornen == NULL){
                 head_hartornen = new;
                 last_hartornen = new;
-            }else{
-                last_hartornen->sinistra = new;
-                last_hartornen = new;
-            }
-            }else if(t == 3){
-                //new->destra = NULL;
-                if(head_hartornen == NULL){
-                    head_hartornen = new;
+            }else{       
+                 if(t == 1){
+                    last_hartornen->avanti = new;
                     last_hartornen = new;
-                }else{
+                }else if(t == 2){
+                    last_hartornen->sinistra = new;
+                    last_hartornen = new;
+                }else if(t == 3){
                     last_hartornen->destra = new;
                     last_hartornen = new;
-                }
-            } 
+                } 
+            }        
+
 
     }
 }
@@ -231,19 +244,18 @@ void print(Cave_t* first){
     }else{
         Cave_t* scan = first;
         int c = 0;
-        do{
-            printf(KNRM"quantita melassa %d\n", scan->melassa);
-
-            switch(scan->scelta[c]){
-                case 1: scan = scan->avanti;
-                    break;
-                case 2: scan = scan->sinistra;
-                    break;
-                case 3: scan = scan->destra;
-                    break;    
-            }
-            c++;
-        } while (c <= 9);
+            do{
+                printf(KGRN"quantita melassa %d del cunicolo %d\n", scan->melassa, c);
+            
+                if(scan->destra == NULL && scan->sinistra == NULL){
+                    scan = scan->avanti;
+                }else if(scan->destra && scan->avanti == NULL){
+                    scan = scan->sinistra;
+                }else if(scan->avanti == NULL && scan->sinistra == NULL){
+                    scan = scan->destra;
+                }
+                c++;  
+            }while(scan != NULL);
         
     } 
 }
