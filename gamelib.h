@@ -15,7 +15,7 @@
 void MainMenu(int *check);
 //! debug void termina_gioco();
 //! debug void gioca();
-
+#define clear  system("clear")
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -69,3 +69,4 @@ typedef struct Caverna Cave_t;
 typedef struct Scavatrice Scava_t;
 
 
+//int setvbuf(stdout, NULL, _IONBF, 0);
