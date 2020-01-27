@@ -67,6 +67,3 @@ struct Scavatrice{
 
 typedef struct Caverna Cave_t;
 typedef struct Scavatrice Scava_t;
-
-
-//int setvbuf(stdout, NULL, _IONBF, 0);

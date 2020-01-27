@@ -728,3 +728,103 @@ static void crea_cunicolo(){
         }
     }while(choice !=3);
 }
+
+//old ins cunicolo
+static void ins_cunicolo(int t, bool b){
+    Cave_t* new = (Cave_t*)malloc(sizeof(Cave_t));
+
+    if(r <= 50){
+        new->melassa = 0; 
+    }else if(r > 51 && r <= 70){
+        new->melassa = 1;
+    }else if(r > 71 && r <= 100){
+        new->melassa = 2;
+    }
+    if(r <= 50){
+        new->stato = 0;
+    }else if(r > 51 && r <= 85){
+        new->stato = 2;
+    }else if(r > 86 && r <= 100){
+        new->stato = 3;
+    }    
+
+    new->avanti = NULL;
+    new->sinistra = NULL;
+    new->destra = NULL;
+
+    if(b == true){
+        if(head_arvais == NULL){
+            head_arvais = new;
+            last_arvais = new;
+        }else{        
+            if(t == 1){
+                last_arvais->avanti = new;
+                last_arvais = new;    
+            }else if(t == 2){
+                last_arvais->sinistra = new;
+                last_arvais = new;
+            }else if(t == 3){
+                last_arvais->destra = new;
+                last_arvais = new;        
+            }  
+        }
+    }else if(b == false){
+            if(head_hartornen == NULL){
+                head_hartornen = new;
+                last_hartornen = new;
+            }else{       
+                 if(t == 1){
+                    last_hartornen->avanti = new;
+                    last_hartornen = new;
+                }else if(t == 2){
+                    last_hartornen->sinistra = new;
+                    last_hartornen = new;
+                }else if(t == 3){
+                    last_hartornen->destra = new;
+                    last_hartornen = new;
+                } 
+            }        
+
+
+    }
+}
+//modified
+static void ins_cunicolo(int t, Cave_t* head, Cave_t* last){
+    Cave_t* new = head;
+
+    if(r <= 50){
+        new->melassa = 0; 
+    }else if(r > 51 && r <= 70){
+        new->melassa = 1;
+    }else if(r > 71 && r <= 100){
+        new->melassa = 2;
+    }
+    if(r <= 50){
+        new->stato = 0;
+    }else if(r > 51 && r <= 85){
+        new->stato = 2;
+    }else if(r > 86 && r <= 100){
+        new->stato = 3;
+    }    
+
+    new->avanti = NULL;
+    new->sinistra = NULL;
+    new->destra = NULL;
+
+        if(head == NULL){
+            head = new;
+            last = new;
+        }else{        
+            if(t == 1){
+                last->avanti = new;
+                last = new;    
+            }else if(t == 2){
+                last->sinistra = new;
+                last = new;
+            }else if(t == 3){
+                last->destra = new;
+                last = new;        
+            }  
+        }
+    
+}
