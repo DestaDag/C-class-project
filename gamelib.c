@@ -8,7 +8,7 @@
 static void crea_cunicolo();
 
 //outputs the linked list
-static void stampa_cunicolo(Cave_t* first);
+static void stampa_cunicolo(Cave_t** first);
 //function for exiting from the map creation menu
 static int chiudi_cunicolo();
 //static void avanza();
@@ -18,10 +18,7 @@ static int chiudi_cunicolo();
 //creates the two structures
 static void ins_cunicolo(int t, Cave_t** head, Cave_t** last);
 //deletes the last node
-static void  canc_caverna(Cave_t* first, Cave_t* last, int t);
-//static void print(Cave_t* cave, int t);//to display the linked list
-//outputs the linked list
-static void stampa_cunicolo(Cave_t* first);
+static void  canc_caverna(int t, Cave_t** first, Cave_t** last);
 // to check if creating map is done
 static int control = 0;
 //pointers to the first and last node of the arvais linked list
@@ -144,16 +141,33 @@ static void crea_cunicolo(){
         case 2:
             clear;
             printf(KGRN"Ecco i cunicoli creati per la famiglia arvais con le loro rispettive quantita di melassa\n");
-            stampa_cunicolo(head_arvais);
+            stampa_cunicolo(&head_arvais);
             delay(1);
             printf(KGRN"Ecco i cunicoli creati per la famiglia hartornen con le loro rispettive quantita di melassa\n");
-            stampa_cunicolo(head_hartornen);
+            stampa_cunicolo(&head_hartornen);
             delay(5);
             
             //*check  = 1;
         break;
         case 3:
-             canc_caverna(head_arvais, last_hartornen, c);     
+            clear;
+            int x;
+            printf(KGRN"Quale cunicolo vuoi eliminare?\n");
+            printf("\t1---CUNICOLO FAMIGLIA ARVAIS\n\t2---CUNICOLO FAMIGLIA ARVAIS\n"KYEL"$");
+            do{
+                scanf("%d", &x);
+                if(x != 1 && x != 2){
+                    if(r <= 50){
+                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                    }else{
+                        printf(KRED"Gli input devono essere '1' o '2' , riprova\n"KYEL"$ ");
+                    }
+                }
+            }while(c != 1 && c != 2 && c != 3);
+            if(x == 1)
+                canc_caverna(c, &head_arvais, &last_arvais);
+            else
+                canc_caverna(c, &head_hartornen, &last_hartornen);     
         break;
         case 4:
             if(control == 1){
@@ -165,7 +179,7 @@ static void crea_cunicolo(){
                         printf(KRED"Ricordati che i cunicoli per entrambe le famiglie devono essere dieci!\n");
             } 
         }
-    }while(choice !=3);
+    }while(choice !=4);
 }
 
 static void ins_cunicolo(int t, Cave_t** head, Cave_t** last){
@@ -206,14 +220,15 @@ static void ins_cunicolo(int t, Cave_t** head, Cave_t** last){
             }  
             
         }
-    new = NULL;
+    
 }
 
-static void stampa_cunicolo(Cave_t* first){
-    if(first == NULL){
+static void stampa_cunicolo(Cave_t** first){
+    if(*first == NULL){
         printf(KRED"Non c'è nessun cunicolo\n");
     }else{
-        Cave_t* scan = first;
+        Cave_t* scan = NULL;
+        scan = *first;
         int c = 1;
             do{
                 printf(KGRN"Quantita melassa:%d-------del cunicolo %d\n", scan->melassa, c);
@@ -227,6 +242,8 @@ static void stampa_cunicolo(Cave_t* first){
                 }
                 c++;  
             }while(scan != NULL);
+            printf(KGRN"L'ultimo cunicolo è stato eliminato\n");
+            delay(1);
         
     } 
 }
@@ -265,19 +282,19 @@ static int chiudi_cunicolo(){
     return s;
 }
     
-static void canc_caverna(Cave_t* first, Cave_t* last, int t){
-    if(first == NULL){
+static void canc_caverna(int t, Cave_t** first, Cave_t** last){
+    if(*first == NULL){
         printf(KRED"Non è presente un cunicolo\n");
     }else{
         Cave_t* prev = NULL;
-        Cave_t* scan = first;
+        Cave_t* scan = *first;
 
         if(scan->avanti == NULL && scan->sinistra == NULL && scan->destra == NULL){
             free(scan);
             first = NULL;
         }else{
             do{
-                if(scan->avanti == last || scan->sinistra == last || scan->destra == last){
+                if(scan->avanti == *last || scan->sinistra == *last || scan->destra == *last){
                     prev = scan;
                     break;
                 }else{
