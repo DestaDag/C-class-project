@@ -8,10 +8,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
-/**
- * principal function called by main() that displays the main menu of the game
- * @param *check to exit loop and enter command line
-*/
 void MainMenu(int *check);
 //! debug void termina_gioco();
 //! debug void gioca();
@@ -48,6 +44,14 @@ typedef enum Tipo_imprevisto Ti_t;
 typedef enum Quantita_melassa Qm_t;
 typedef enum Tipo_caverna Tp_t;
 
+struct Scavatrice{
+    struct Caverna* position;
+    int energia;
+    int raccolta;
+    
+
+};
+
 struct Caverna{
     struct Caverna *avanti;
     struct Caverna *sinistra;
@@ -57,13 +61,7 @@ struct Caverna{
     Tp_t  stato;  
 };
 
-struct Scavatrice{
-    struct Caverna* position;
-    int energia;
-    int raccolta;
-    
 
-};
 
 typedef struct Caverna Cave_t;
 typedef struct Scavatrice Scava_t;
