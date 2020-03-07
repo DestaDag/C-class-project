@@ -11,7 +11,7 @@
 void MainMenu(int *check);
 //! debug void termina_gioco();
 //! debug void gioca();
-#define clear  system("clear")
+#define clear  printf("\e[1;1H\e[2J")
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"

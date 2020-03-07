@@ -887,3 +887,79 @@ static void ins_cunicolo(int t, bool b){
 
     }
 }
+
+static void canc_caverna(int t, Cave_t* first, Cave_t* last){
+    if(first == NULL){
+        printf(KRED"Non è presente un cunicolo\n");
+    }else{
+        Cave_t* prev = NULL;
+        Cave_t* scan = first;
+        //only one node in the linked list
+        if(scan->avanti == NULL && scan->sinistra == NULL && scan->destra == NULL){
+            free(scan);
+            first = NULL;
+        }else{
+            do{
+                if(scan->avanti == last || scan->sinistra == last || scan->destra == last){
+                    prev = scan;
+                    break;
+                }else{
+                    if(t == 1){
+                        scan = scan->avanti;
+                    }else if(t == 2){
+                        scan = scan->sinistra;
+                    }else if(t == 3){
+                        scan = scan->destra;
+                    }
+                }
+                    
+            }while(scan != NULL);
+            printf(KGRN"L'ultimo cunicolo è stato eliminato\n");
+                    /*if(t == 1){
+                      prev->avanti = NULL;
+                    }else if(t == 2){
+                        prev->sinistra = NULL;
+                    }else if(t == 3){
+                        prev->destra = NULL;
+                    }*/
+                    prev = NULL;
+                    last = prev;
+        }
+    }
+}
+
+static void canc_caverna(int t, Cave_t* head){
+    Cave_t *toDelete, *last;
+
+    if(head == NULL){
+        printf(KRED"Non c'e` alcun cunicolo\n");
+    }else{
+        toDelete = head;
+        last = head;
+
+        while (toDelete->avanti != NULL && toDelete->sinistra != NULL && toDelete->destra != NULL){
+            last = toDelete;
+            if(t == 1){
+                last = toDelete->avanti;
+            }else if(t == 2){
+                last = toDelete->sinistra;
+            }else if(t == 3){
+                last = toDelete->destra;
+            }
+            if(toDelete == head){
+                head = NULL;
+            }else{
+                if(last->avanti != NULL){
+                    last->avanti = NULL;
+                }else if(last->sinistra != NULL){
+                    last->sinistra = NULL;
+                }
+            }
+            free(toDelete);
+
+            printf(KGRN"Il cunicolo e` stato eliminato")
+        }
+        
+
+    }
+}
