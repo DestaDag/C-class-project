@@ -1,5 +1,0 @@
-/cygdrive/c/Users/dagde/Documents/c/Progetto2019
-gcc -c main.c
-gcc -c gamelib.c
-gcc -o gioca main.o gamelib.o
-./gioca
