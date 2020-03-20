@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-void MainMenu(int check);
+int MainMenu(int check);
 void termina_gioco();
 void gioca();
 

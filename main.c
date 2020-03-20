@@ -11,7 +11,7 @@ int main(){
     srand(time(NULL));
     do{
         do{
-            MainMenu(check);
+            check = MainMenu(check);
         } while (!check);
         clear;
         gioca();

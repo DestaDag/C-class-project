@@ -37,7 +37,7 @@ static Cave_t* last_hartornen = NULL;
 static Scava_t arvais;
 static Scava_t hartornen;
 
-void MainMenu(int check){
+int MainMenu(int check){
     int choice = 0;
     clear;
     printf(KRED"\t******************\n");
@@ -47,7 +47,7 @@ void MainMenu(int check){
     printf(KRED"\t******************\n\n\n");
    
     printf(KMAG"--------MAIN-MENU--------\n");
-    printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" GIOCA\n\t"KRED"3-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
+    printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
     scanf("%d", &choice);
     
     switch (choice){
@@ -56,13 +56,10 @@ void MainMenu(int check){
         check = 1;
         break;
     case 2:
-        clear;
-        gioca();
-        break;
-    case 3:
         termina_gioco();
         break;
     }
+    return check;
 }
 
 static void crea_cunicolo(){
@@ -95,55 +92,53 @@ static void crea_cunicolo(){
             */
             if(counter_a >= 11)
                 printf(KRED"Sono state create 10 cunicoli per la famiglia ARVAIS\n");
-            do{
-                clear;
-                printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia ARVAIS:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_a);
-                ++counter_a;
-            
-                printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n");
-              
-                printf(KYEL"$ ");
                 
-                do{            
-                    scanf("%d", &c);
-                    if(c != 1 && c != 2 && c != 3){
-                        if(r <= 50){
-                            printf(KRED"Input sbagliato, riprova.\n"KYEL"$ ");
-                        }else{
-                            printf(KRED"Gli input devono essere '1', '2', '3'\n"KYEL"$ ");
-                        }
-                    }
-                }while(c != 1 && c != 2 && c != 3);
-                b = true;
-                ins_cunicolo(c, b);
-            }while(counter_a <= 10);
+            clear;
+            printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia ARVAIS:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_a);
+            ++counter_a;
             
+            printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n");
+              
+            printf(KYEL"$ ");
+                
+            do{            
+                scanf("%d", &c);
+                if(c != 1 && c != 2 && c != 3){
+                    if(r <= 50){
+                       printf(KRED"Input sbagliato, riprova.\n"KYEL"$ ");
+                    }else{
+                        printf(KRED"Gli input devono essere '1', '2', '3'\n"KYEL"$ ");
+                    }
+                }
+            }while(c != 1 && c != 2 && c != 3);
+            b = true;
+            ins_cunicolo(c, b);
+
             /*
                 PER CREARE CUNICOLI PER LA FAMIGLIA HARTORNEN
             */
 
             if(counter_h >= 11)
                 printf(KRED"Sono state create 10 cunicoli per la famiglia HARTORNEN\n");
-            do{
-                clear;
-                printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia HARTORNEN:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_h);
-                ++counter_h;
+                
+            clear;
+            printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia HARTORNEN:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_h);
+            ++counter_h;
             
-                printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n"); 
-                printf(KYEL"$ ");
-                do{
-                    scanf("%d", &c);
-                    if(c != 1 && c != 2 && c != 3){
-                        if(r <= 50){
-                            printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
-                        }else{
-                            printf(KRED"Gli input devono essere '1' o '2' o '3', riprova\n"KYEL"$ ");
-                        }
+            printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n"); 
+            printf(KYEL"$ ");
+            do{
+                scanf("%d", &c);
+                if(c != 1 && c != 2 && c != 3){
+                    if(r <= 50){
+                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                    }else{
+                        printf(KRED"Gli input devono essere '1' o '2' o '3', riprova\n"KYEL"$ ");
                     }
-                }while(c != 1 && c != 2 && c != 3);
-                b = false;
-                ins_cunicolo(c, b);
-            }while(counter_h <= 10);
+                }
+            }while(c != 1 && c != 2 && c != 3);
+            b = false;
+            ins_cunicolo(c, b);
             
             control = 1;            
             if(counter_h == 11 && counter_a == 1){
@@ -196,8 +191,9 @@ static void crea_cunicolo(){
                         printf(KRED"Ricordati che i cunicoli per entrambe le famiglie devono essere dieci!\n");
                     }
             } 
+        
         }
-    }while(choice !=4);
+    }while(choice !=4);  
 }
 
 static void ins_cunicolo(int t, bool b){
