@@ -1,16 +1,20 @@
-/**
- * @author DESTA DAGIM AYENEW
- * MATRCICOLA: 314650
+/*
+    DESTA DAGIM AYENEW
+    MATRICOLA: 314650
+    v: 0.1.0
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
-void MainMenu(int *check);
-//! debug void termina_gioco();
-//! debug void gioca();
+
+void MainMenu(int check);
+void termina_gioco();
+void gioca();
+
 #define clear  printf("\e[1;1H\e[2J")
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
@@ -44,24 +48,22 @@ typedef enum Tipo_imprevisto Ti_t;
 typedef enum Quantita_melassa Qm_t;
 typedef enum Tipo_caverna Tp_t;
 
+struct Caverna{
+    struct Caverna *avanti;
+    struct Caverna *sinistra;
+    struct Caverna *destra;
+    Qm_t melassa;
+    Tp_t  stato;  
+};
+
+typedef struct Caverna Cave_t;
+
 struct Scavatrice{
-    struct Caverna* position;
+    Cave_t* position;
     int energia;
     int raccolta;
     
 
 };
 
-struct Caverna{
-    struct Caverna *avanti;
-    struct Caverna *sinistra;
-    struct Caverna *destra;
-    int scelta[10];
-    Qm_t melassa;
-    Tp_t  stato;  
-};
-
-
-
-typedef struct Caverna Cave_t;
 typedef struct Scavatrice Scava_t;

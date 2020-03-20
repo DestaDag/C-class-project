@@ -1,7 +1,9 @@
 /*
     DESTA DAGIM AYENEW
     MATRICOLA: 314650
+    v: 0.1.0
 */
+
 #include "gamelib.h"
 
 //function for creating, deleting and printing linked list
@@ -17,9 +19,11 @@ static int chiudi_cunicolo();
 //creates the two structures
 static void ins_cunicolo(int t, bool b);
 //deletes the last node
-static void  canc_caverna(int t, Cave_t* tail, Cave_t* head);
+static void  canc_caverna(int t, Cave_t* head, Cave_t* tail);
 // to check if creating map is done
 static int control = 0;
+static int counter_a = 1;
+static int counter_h = 1;
 //to check if canc_caverna() has been called
 bool delete_check;
 //pointers to the first and last node of the arvais linked list
@@ -28,35 +32,20 @@ static Cave_t* last_arvais = NULL;
 //pointers to the first and last node of the hartornen linked list
 static Cave_t* head_hartornen = NULL;
 static Cave_t* last_hartornen = NULL;
-//delays the next text printed
-static void delay(int number_of_seconds);
 //seed for generating random numbers
 #define r rand()%101
 static Scava_t arvais;
 static Scava_t hartornen;
 
-static void delay(int number_of_seconds){
-    int milli_seconds = 1000 * number_of_seconds;
-    clock_t start_time = clock();
-    while(clock() < start_time + milli_seconds);
-}
-
-void MainMenu(int *check){
+void MainMenu(int check){
     int choice = 0;
     clear;
-    //printf(KYEL"\n\nprima di iniziare regolare le dimensioni dello schermo\n");
-    //delay(3);
-    //clear;
-    //printf(KYEL"\n\nloading...\n\n");
-    //delay(3);
-    //clear;
     printf(KRED"\t******************\n");
     printf(KRED"\t*                *\n");
     printf(KRED"\t*BENVENUTO A DUNE*\n");
     printf(KRED"\t*                *\n");
     printf(KRED"\t******************\n\n\n");
-    //delay(3);
-    //clear;
+   
     printf(KMAG"--------MAIN-MENU--------\n");
     printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" GIOCA\n\t"KRED"3-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
     scanf("%d", &choice);
@@ -64,13 +53,14 @@ void MainMenu(int *check){
     switch (choice){
     case 1:
         crea_cunicolo();
+        check = 1;
         break;
     case 2:
-        printf("gioca\n");
+        clear;
+        gioca();
         break;
     case 3:
-        printf("termina gioco");
-        //  termina_gioco();
+        termina_gioco();
         break;
     }
 }
@@ -79,8 +69,7 @@ static void crea_cunicolo(){
     int choice = 0;
     int c;
     bool b = true;
-    int counter_a = 1;
-    int counter_h = 1;
+
     do{
         //clear;
         printf(KMAG"\n\n--------MAP-CREATION-MENU-------\n");
@@ -100,71 +89,67 @@ static void crea_cunicolo(){
             }
         }
         switch(choice){
-        case 1: 
-            clear;
-            if(delete_check == true){
-                if(counter_a == 1)
-                    counter_a = 1;
-                else
-                    --counter_a;
-            }
-            printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia Arvais:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_a);
-            ++counter_a;
-            printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n");                
-            printf(KYEL"$ ");
-                
-            do{            
-                scanf("%d", &c);
-                if(c != 1 && c != 2 && c != 3){
-                    if(r <= 50){
-                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ ");
-                    }else{
-                        printf(KRED"Gli input devono essere '1' o '2' o '3'\n"KYEL"$ ");
-                    }
-                }
-            }while(c != 1 && c != 2 && c != 3);
-            b = true;
-            ins_cunicolo(c, b);
-            //head_arvais->scelta[counter] = c;
-            clear;
-            if(delete_check == true){
-                if(counter_h == 1)
-                    counter_h = 1;
-                else
-                    --counter_h;
-            }
-            printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia Hartornen:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_h);
-            ++counter_h;
-            printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n"); 
-            printf(KYEL"$ ");
+        case 1:
+            /*
+                PER CREARE CUNICOLI PER LA FAMIGLIA ARVAIS
+            */
+            if(counter_a >= 11)
+                printf(KRED"Sono state create 10 cunicoli per la famiglia ARVAIS\n");
             do{
-                scanf("%d", &c);
-                if(c != 1 && c != 2 && c != 3){
-                    if(r <= 50){
-                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
-                    }else{
-                        printf(KRED"Gli input devono essere '1' o '2' o '3', riprova\n"KYEL"$ ");
-                    }
-                }
-            }while(c != 1 && c != 2 && c != 3);
-            b = false;
-            ins_cunicolo(c, b);
-            //head_hartornen->scelta[counter] = c;
-            if(counter_h == 10 && counter_a == 10){
-                control = 1;
-                printf(KGRN"Sono state create 10 cunicoli per entrambe le famiglie\n");
-            }
-            break;
-        case 3:
-            clear;
-            printf(KGRN"Ecco i cunicoli creati per la famiglia arvais con le loro rispettive quantita di melassa\n");
-            stampa_cunicolo(head_arvais);
-            delay(1);
-            printf(KGRN"\nEcco i cunicoli creati per la famiglia hartornen con le loro rispettive quantita di melassa\n");
-            stampa_cunicolo(head_hartornen);
-            delay(5);
+                clear;
+                printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia ARVAIS:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_a);
+                ++counter_a;
             
-            //*check  = 1;
+                printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n");
+              
+                printf(KYEL"$ ");
+                
+                do{            
+                    scanf("%d", &c);
+                    if(c != 1 && c != 2 && c != 3){
+                        if(r <= 50){
+                            printf(KRED"Input sbagliato, riprova.\n"KYEL"$ ");
+                        }else{
+                            printf(KRED"Gli input devono essere '1', '2', '3'\n"KYEL"$ ");
+                        }
+                    }
+                }while(c != 1 && c != 2 && c != 3);
+                b = true;
+                ins_cunicolo(c, b);
+            }while(counter_a <= 10);
+            
+            /*
+                PER CREARE CUNICOLI PER LA FAMIGLIA HARTORNEN
+            */
+
+            if(counter_h >= 11)
+                printf(KRED"Sono state create 10 cunicoli per la famiglia HARTORNEN\n");
+            do{
+                clear;
+                printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia HARTORNEN:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_h);
+                ++counter_h;
+            
+                printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n"); 
+                printf(KYEL"$ ");
+                do{
+                    scanf("%d", &c);
+                    if(c != 1 && c != 2 && c != 3){
+                        if(r <= 50){
+                            printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                        }else{
+                            printf(KRED"Gli input devono essere '1' o '2' o '3', riprova\n"KYEL"$ ");
+                        }
+                    }
+                }while(c != 1 && c != 2 && c != 3);
+                b = false;
+                ins_cunicolo(c, b);
+            }while(counter_h <= 10);
+            
+            control = 1;            
+            if(counter_h == 11 && counter_a == 1){
+                clear;
+                printf(KGRN"Sono state create 10 cunicoli per entrambe le famiglie\nSi puo` proseguire con il gioco\n");
+            }
             break;
         case 2:
             clear;
@@ -181,22 +166,35 @@ static void crea_cunicolo(){
                     }
                 }
             }while(x != 1 && x != 2 && x != 3);
+            
             if(x == 1){
-                canc_caverna(c, last_arvais, head_arvais);
+                canc_caverna(c, head_arvais, last_arvais);
                 delete_check = false;
             }else{
-                canc_caverna(c, last_hartornen, head_arvais);
+                canc_caverna(c, head_hartornen, last_hartornen);
                 delete_check = true; 
             }    
             break;
+        case 3:
+            clear;
+            printf(KGRN"Ecco i cunicoli creati per la famiglia ARVAIS con le loro rispettive quantita di melassa\n");
+            stampa_cunicolo(head_arvais);
+
+            printf(KGRN"\nEcco i cunicoli creati per la famiglia HARTORNEN con le loro rispettive quantita di melassa\n");
+            stampa_cunicolo(head_hartornen);
+
+        break;
         case 4:
-            if(control == 1){
-            printf("Chiudi cunicolo\n");   
+            if(counter_h == 11 && counter_a == 11){
+                choice = chiudi_cunicolo();
                 }else{
-                    if(r <= 50)
+                    if(r <= 50){
+                        clear;
                         printf(KRED"Non sono state creati tutti i cunicoli!\n");
-                    else
+                    }else{
+                        clear;
                         printf(KRED"Ricordati che i cunicoli per entrambe le famiglie devono essere dieci!\n");
+                    }
             } 
         }
     }while(choice !=4);
@@ -215,9 +213,9 @@ static void ins_cunicolo(int t, bool b){
     if(r <= 50){
         new->stato = 0;
     }else if(r > 51 && r <= 85){
-        new->stato = 2;
+        new->stato = 1;
     }else if(r > 86 && r <= 100){
-        new->stato = 3;
+        new->stato = 2;
     }    
 
     new->avanti = NULL;
@@ -277,7 +275,9 @@ static void stampa_cunicolo(Cave_t* first){
                 }else if(scan->avanti == NULL && scan->sinistra == NULL){
                     scan = scan->destra;
                 }
-                c++;  
+                c++;
+                if(c > 10)
+                    break;
             }while(scan != NULL);
     } 
 }
@@ -285,67 +285,89 @@ static void stampa_cunicolo(Cave_t* first){
 static int chiudi_cunicolo(){
     clear;
     printf(KGRN"Sicuro? se esci dalla modalità--- CREA CUNICOLO ---non potrai più rientrare fino alla chiusura del gioco...\n");
-    char temp='0';
+    int  temp=0;
     int s;
     do{
-        printf(KGRN"(y/n)\n"KYEL"$ ");
-        scanf(" %c",&temp);
-
-        if(temp=='N'){
-            s=1;
-           // printf(KGRN"andando a crea inserisci cunicoli\n");
+        printf(KGRN"premere '1' per proseguire, premere '2' per ritornare al menu\n"KYEL"$ ");
+        scanf("%d",&temp);
+        if(temp==2){
             clear;
-        }else if(temp =='Y'){
-            if(control != 1){
-                clear;
-                printf(KRED"Impossibile uscire, non tutti i cunicoli sono stati creati\n");
-                s=1;
-            }else{
-                s= 3;
-                clear;
-                printf(KGRN"Chiusura modalità crea mondo...\n");
-
-            }
+            printf(KGRN"Cosa vuoi effettuare?\n");
+            printf(KMAG"1-"KYEL" ELIMINA CUNICOLO\n"KMAG"2-"KYEL" STAMPA CUNICOLO\n");
+            scanf("%d", &s);
+            return s;
+            clear;
+        }else if(temp ==1){
+            s = 4;
         }else{
             clear;
             printf("Valore non riconosciuto...reinserisci la tua risposta\n");
         }
-    }while((temp!='N')&&(temp!='Y'));
+    }while((temp!=2)&&(temp!=1));   
     return s;
 }
     
-static void canc_caverna(int t, Cave_t* tail, Cave_t * head){
-    Cave_t *toDelete, *last;
+static void canc_caverna(int t, Cave_t* head, Cave_t * tail){
+    if(head == NULL)
+        printf(KRED"Non c'e` nessun cunicolo da eliminare!\n");
+    else{
+        Cave_t* pPrev = NULL;
+        Cave_t* pScan  = head;
 
-    if(head == NULL){
-        printf(KRED"Non c'e` alcun cunicolo\n");
-    }else{
-        
-        toDelete = head;
-        last = tail;
-        free(last);
-        printf(KGRN"Il cunicolo e` stato eliminato");
-        last = NULL;
-        do{
-            if(toDelete->avanti == NULL && toDelete->sinistra == NULL){
-                toDelete = toDelete->avanti;
-                //last = toDelete;
-            }else if(toDelete->destra == NULL && toDelete->sinistra == NULL){
-                toDelete = toDelete->sinistra;
-                //last = toDelete;
-            }else if(toDelete->avanti == NULL && toDelete->sinistra == NULL){
-                toDelete = toDelete->destra;
-                //last = toDelete;
-            }
-        }while(toDelete != NULL);
-
-        
-        // /printf(KGRN"Ultimo cunicolo inserito ha melassa: %d", toDelete->melassa);
-        //free(last);
-        //last = NULL;
-        
-    }
-    //        
+        if(pScan->avanti == NULL && pScan->sinistra == NULL && pScan->destra == NULL){//abbiamo solo un cunicolo
+            free(pScan);
+            head = NULL;
+        }
+        else{
+            do{
+                if(((pScan->avanti) == tail) || ((pScan->sinistra) == tail) || ((pScan->destra) == tail)){
+                    pPrev = pScan;
+                    break;
+                }else{
+                    if(pScan->destra == NULL && pScan->sinistra == NULL){
+                        pScan = pScan->avanti;
+                    }else if(pScan->destra == NULL && pScan->avanti == NULL){
+                        pScan = pScan->sinistra;
+                    }else if(pScan->avanti == NULL && pScan->sinistra == NULL){
+                        pScan = pScan->destra;
+                    }
+                }
+            }while(pScan != NULL);
+            
     
+            free(pPrev->avanti);
+            //pPrev = NULL;
+            pPrev->avanti = NULL;
+            pPrev->sinistra = NULL;
+            pPrev->destra = NULL;
+            pScan->avanti = pPrev;
+            pScan->sinistra = NULL;
+            pScan->destra = NULL;
+            tail = pPrev;
+            free(pPrev->sinistra);
+            pPrev->sinistra = NULL;
+            pScan->sinistra = NULL;
+            tail = pPrev;
+            free(pPrev->destra);
+            pPrev->destra = NULL;
+            pScan->sinistra = NULL;
+            tail = pPrev;
+            printf(KGRN"Il cunicolo e` stato rimosso!\n");
+            //free(pPrev);
+            //pPrev->avanti = pPrev->sinistra = pPrev->destra = NULL;
+            //tail = pPrev;
+            head = pPrev;
+        }
+    }
+}
 
+void gioca(){
+    clear;
+    printf(KGRN"Gioca!\n");
+
+}
+
+void termina_gioco(){
+    clear;
+    printf(KNRM"Termina gioco\n");
 }

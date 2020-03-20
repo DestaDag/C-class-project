@@ -1,3 +1,9 @@
+/*
+    DESTA DAGIM AYENEW
+    MATRICOLA: 314650
+    v: 0.1.0
+*/
+
 #include "gamelib.h"
 
 int main(){
@@ -5,9 +11,10 @@ int main(){
     srand(time(NULL));
     do{
         do{
-            MainMenu(&check);
+            MainMenu(check);
         } while (!check);
-      // gioca();
+        clear;
+        gioca();
         
     } while (1);
     
