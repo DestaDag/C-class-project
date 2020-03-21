@@ -5,7 +5,15 @@
 */
 
 #include "gamelib.h"
+static Cave_t* head_arvais = NULL;
+static Cave_t* last_arvais = NULL;
+//pointers to the first and last node of the hartornen linked list
+static Cave_t* head_hartornen = NULL;
+static Cave_t* last_hartornen = NULL;
 
+static Scava_t arvais;
+
+#define r rand()%101
 //function for creating, deleting and printing linked list
 static void crea_cunicolo();
 //outputs the linked list
@@ -17,25 +25,17 @@ static int chiudi_cunicolo();
 //static void aggira();
 //static void esci();
 //creates the two structures
-static void ins_cunicolo(int t, bool b);
+static void ins_cunicolo(Cave_t **head, int t);
 //deletes the last node
-static void  canc_caverna(int t, Cave_t* head, Cave_t* tail);
+static void  canc_caverna(Cave_t* head, int t);
 // to check if creating map is done
 static int control = 0;
 static int counter_a = 1;
 static int counter_h = 1;
 //to check if canc_caverna() has been called
 bool delete_check;
-//pointers to the first and last node of the arvais linked list
-static Cave_t* head_arvais = NULL;
-static Cave_t* last_arvais = NULL;
-//pointers to the first and last node of the hartornen linked list
-static Cave_t* head_hartornen = NULL;
-static Cave_t* last_hartornen = NULL;
-//seed for generating random numbers
-#define r rand()%101
-static Scava_t arvais;
-static Scava_t hartornen;
+
+
 
 int MainMenu(int check){
     int choice = 0;
@@ -112,7 +112,7 @@ static void crea_cunicolo(){
                 }
             }while(c != 1 && c != 2 && c != 3);
             b = true;
-            ins_cunicolo(c, b);
+            ins_cunicolo(&head_arvais, c);
 
             /*
                 PER CREARE CUNICOLI PER LA FAMIGLIA HARTORNEN
@@ -138,7 +138,7 @@ static void crea_cunicolo(){
                 }
             }while(c != 1 && c != 2 && c != 3);
             b = false;
-            ins_cunicolo(c, b);
+            ins_cunicolo(&head_hartornen, c);
             
             control = 1;            
             if(counter_h == 11 && counter_a == 1){
@@ -163,10 +163,10 @@ static void crea_cunicolo(){
             }while(x != 1 && x != 2 && x != 3);
             
             if(x == 1){
-                canc_caverna(c, head_arvais, last_arvais);
+                canc_caverna(head_arvais, x);
                 delete_check = false;
             }else{
-                canc_caverna(c, head_hartornen, last_hartornen);
+                canc_caverna(head_hartornen, x);
                 delete_check = true; 
             }    
             break;
@@ -196,8 +196,8 @@ static void crea_cunicolo(){
     }while(choice !=4);  
 }
 
-static void ins_cunicolo(int t, bool b){
-    Cave_t* new = (Cave_t*)malloc(sizeof(Cave_t));
+static void ins_cunicolo(Cave_t** head, int t){
+    Cave_t *new = (Cave_t*)malloc(sizeof(Cave_t));
 
     if(r <= 50){
         new->melassa = 0; 
@@ -218,63 +218,42 @@ static void ins_cunicolo(int t, bool b){
     new->sinistra = NULL;
     new->destra = NULL;
 
-    if(b == true){
-        if(head_arvais == NULL){
-            head_arvais = new;
-            last_arvais = new;
-        }else{        
-            if(t == 1){
-                last_arvais->avanti = new;
-                last_arvais = new;    
-            }else if(t == 2){
-                last_arvais->sinistra = new;
-                last_arvais = new;
-            }else if(t == 3){
-                last_arvais->destra = new;
-                last_arvais = new;        
-            }  
-        }
-    }else if(b == false){
-            if(head_hartornen == NULL){
-                head_hartornen = new;
-                last_hartornen = new;
-            }else{       
-                 if(t == 1){
-                    last_hartornen->avanti = new;
-                    last_hartornen = new;
-                }else if(t == 2){
-                    last_hartornen->sinistra = new;
-                    last_hartornen = new;
-                }else if(t == 3){
-                    last_hartornen->destra = new;
-                    last_hartornen = new;
-                } 
-            }        
-
-
-    }
+    if(*head == NULL)
+        *head = new;
+    else{
+        if(t == 1){
+            new->avanti = *head;
+            *head = new;
+        }else if(t == 2){
+            new->sinistra = *head;
+            *head = new;
+        }else if(t == 3){
+            new->destra = *head;
+            *head = new;      
+            }            
+    }    
 }
 
-static void stampa_cunicolo(Cave_t* first){
+static void stampa_cunicolo(Cave_t*first){
+    Cave_t* scan = first;
     if(first == NULL){
         printf(KRED"Non c'è nessun cunicolo\n");
     }else{
-        Cave_t* scan = first;
         int c = 1;
             do{
-                printf(KYEL"Quantita melassa:"KMAG"%d"KYEL"-------del cunicolo"KMAG" %d\n", scan->melassa, c);
+                printf(KYEL"Quantita melassa:"KMAG"%d"KYEL"-------del cunicolo"KMAG" %d\n", *&scan->melassa, c);
             
-                if(scan->destra == NULL && scan->sinistra == NULL){
+                if(*&scan->destra == NULL && *&scan->sinistra == NULL){
                     scan = scan->avanti;
-                }else if(scan->destra == NULL && scan->avanti == NULL){
+                }else if(*&scan->destra == NULL && *&scan->avanti == NULL){
                     scan = scan->sinistra;
-                }else if(scan->avanti == NULL && scan->sinistra == NULL){
+                }else if(*&scan->avanti == NULL && *&scan->sinistra == NULL){
                     scan = scan->destra;
                 }
                 c++;
                 if(c > 10)
                     break;
-            }while(scan != NULL);
+            }while(*&scan->avanti != NULL && *&scan->sinistra != NULL && *&scan->destra != NULL);
     } 
 }
 
@@ -303,57 +282,24 @@ static int chiudi_cunicolo(){
     return s;
 }
     
-static void canc_caverna(int t, Cave_t* head, Cave_t * tail){
-    if(head == NULL)
-        printf(KRED"Non c'e` nessun cunicolo da eliminare!\n");
-    else{
-        Cave_t* pPrev = NULL;
-        Cave_t* pScan  = head;
-
-        if(pScan->avanti == NULL && pScan->sinistra == NULL && pScan->destra == NULL){//abbiamo solo un cunicolo
-            free(pScan);
-            head = NULL;
+static void canc_caverna(Cave_t* head, int t){
+    if(head == NULL){
+        printf(KRED"Non c'e` un cunicolo da eliminare");
+    }else{
+        if(t == 1){
+            Cave_t* temp = head->avanti;
+            free(head);
+            head = temp;
+        }else if(t == 2){
+            Cave_t* temp = head->sinistra;
+            free(head);
+            head = temp;
+        }else if(t == 3){
+            Cave_t* temp = head->destra;
+            free(head);
+            head = temp;    
         }
-        else{
-            do{
-                if(((pScan->avanti) == tail) || ((pScan->sinistra) == tail) || ((pScan->destra) == tail)){
-                    pPrev = pScan;
-                    break;
-                }else{
-                    if(pScan->destra == NULL && pScan->sinistra == NULL){
-                        pScan = pScan->avanti;
-                    }else if(pScan->destra == NULL && pScan->avanti == NULL){
-                        pScan = pScan->sinistra;
-                    }else if(pScan->avanti == NULL && pScan->sinistra == NULL){
-                        pScan = pScan->destra;
-                    }
-                }
-            }while(pScan != NULL);
-            
-    
-            free(pPrev->avanti);
-            //pPrev = NULL;
-            pPrev->avanti = NULL;
-            pPrev->sinistra = NULL;
-            pPrev->destra = NULL;
-            pScan->avanti = pPrev;
-            pScan->sinistra = NULL;
-            pScan->destra = NULL;
-            tail = pPrev;
-            free(pPrev->sinistra);
-            pPrev->sinistra = NULL;
-            pScan->sinistra = NULL;
-            tail = pPrev;
-            free(pPrev->destra);
-            pPrev->destra = NULL;
-            pScan->sinistra = NULL;
-            tail = pPrev;
-            printf(KGRN"Il cunicolo e` stato rimosso!\n");
-            //free(pPrev);
-            //pPrev->avanti = pPrev->sinistra = pPrev->destra = NULL;
-            //tail = pPrev;
-            head = pPrev;
-        }
+        printf(KGRN"Il cunicolo e` stato eliminato");
     }
 }
 

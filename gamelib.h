@@ -56,14 +56,11 @@ struct Caverna{
     Tp_t  stato;  
 };
 
-typedef struct Caverna Cave_t;
-
 struct Scavatrice{
-    Cave_t* position;
+    struct Caverna* position;
     int energia;
-    int raccolta;
-    
-
+    int raccolta; 
 };
 
+typedef struct Caverna Cave_t;
 typedef struct Scavatrice Scava_t;
