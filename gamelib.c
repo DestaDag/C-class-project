@@ -27,7 +27,7 @@ static int chiudi_cunicolo();
 //creates the two structures
 static void ins_cunicolo(Cave_t **head, int t);
 //deletes the last node
-static void  canc_caverna(Cave_t* head, int t);
+static void  canc_caverna(Cave_t** head, int t);
 // to check if creating map is done
 static int control = 0;
 static int counter_a = 1;
@@ -163,10 +163,10 @@ static void crea_cunicolo(){
             }while(x != 1 && x != 2 && x != 3);
             
             if(x == 1){
-                canc_caverna(head_arvais, x);
+                canc_caverna(&head_arvais, x);
                 delete_check = false;
             }else{
-                canc_caverna(head_hartornen, x);
+                canc_caverna(&head_hartornen, x);
                 delete_check = true; 
             }    
             break;
@@ -243,17 +243,17 @@ static void stampa_cunicolo(Cave_t*first){
             do{
                 printf(KYEL"Quantita melassa:"KMAG"%d"KYEL"-------del cunicolo"KMAG" %d\n", *&scan->melassa, c);
             
-                if(*&scan->destra == NULL && *&scan->sinistra == NULL){
+                if(scan->destra == NULL && scan->sinistra == NULL){
                     scan = scan->avanti;
-                }else if(*&scan->destra == NULL && *&scan->avanti == NULL){
+                }else if(scan->destra == NULL && scan->avanti == NULL){
                     scan = scan->sinistra;
-                }else if(*&scan->avanti == NULL && *&scan->sinistra == NULL){
+                }else if(scan->avanti == NULL && scan->sinistra == NULL){
                     scan = scan->destra;
                 }
                 c++;
                 if(c > 10)
                     break;
-            }while(*&scan->avanti != NULL && *&scan->sinistra != NULL && *&scan->destra != NULL);
+            }while(scan != NULL);
     } 
 }
 
@@ -282,22 +282,23 @@ static int chiudi_cunicolo(){
     return s;
 }
     
-static void canc_caverna(Cave_t* head, int t){
-    if(head == NULL){
+static void canc_caverna(Cave_t**head, int t){
+    Cave_t* first = *head;
+    if(*head == NULL){
         printf(KRED"Non c'e` un cunicolo da eliminare");
     }else{
-        if(t == 1){
-            Cave_t* temp = head->avanti;
-            free(head);
-            head = temp;
-        }else if(t == 2){
-            Cave_t* temp = head->sinistra;
-            free(head);
-            head = temp;
-        }else if(t == 3){
-            Cave_t* temp = head->destra;
-            free(head);
-            head = temp;    
+        if(first->destra == NULL && first->sinistra == NULL){
+            Cave_t* temp = first->avanti;
+            free(*head);
+            *head = temp;
+        }else if(first->avanti == NULL && first->destra == NULL){
+            Cave_t* temp = first->sinistra;
+            free(*head);
+            *head = temp;
+        }else if(first->avanti == NULL && first->sinistra == NULL){
+            Cave_t* temp = first->destra;
+            free(*head);
+            *head = temp;    
         }
         printf(KGRN"Il cunicolo e` stato eliminato");
     }
