@@ -451,17 +451,18 @@ static void avanza(Scava_t player){
     }
     if(r <= 25){
         printf(KGRN"Il prossimo cunicolo è crollato, devi iserire uno nuovo\n");
-    //moves the player one cave ahead
-    if(player.position->destra == NULL && player.position->sinistra == NULL){
-        printf("Ti sei spostato di un cunicolo in avanti\n");
-        player.position = player.position->avanti;
-    }else if(player.position->destra == NULL && player.position->avanti == NULL){
-        printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n");
-        player.position = player.position->sinistra;
-    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
-        printf(KGRN"Ti sei spostato di un cunicolo a destra\n");
-        player.position = player.position->destra;
-    }
+    }else{
+        //moves the player one cave ahead
+        if(player.position->destra == NULL && player.position->sinistra == NULL){
+            printf("Ti sei spostato di un cunicolo in avanti\n");
+            player.position = player.position->avanti;
+        }else if(player.position->destra == NULL && player.position->avanti == NULL){
+            printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n");
+            player.position = player.position->sinistra;
+        }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+            printf(KGRN"Ti sei spostato di un cunicolo a destra\n");
+            player.position = player.position->destra;
+        }
     }
 }
 
