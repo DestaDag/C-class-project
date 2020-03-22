@@ -8,20 +8,20 @@
 
 static Cave_t* head_arvais = NULL;
 static Cave_t* head_hartornen = NULL;
-
 static Scava_t arvais;
 static Scava_t hartornen;
 
-#define r rand()%101
-static void crea_cunicolo();
-static void stampa_cunicolo(Cave_t* first);
-static int chiudi_cunicolo();
-static void avanza(Scava_t player);
-static void abbatti(Scava_t player);
-static void aggira(Cave_t **head);
+#define r rand()%101    //seed for generating random numbers
+static void crea_cunicolo();    //creation menu
+static void stampa_cunicolo(Cave_t* first); //prints  created caves 
+static int chiudi_cunicolo();   //closes the  creation menu
+static void avanza(Scava_t player); //moves the player to the next cave
+static void abbatti(Scava_t player, short count);
+static void abbatti_cunicolo(Cave_t **head, short count, int t);
+static void aggira(Scava_t player); // adds a node if the node gets destroyed
 static void esci();
-static void ins_cunicolo(Cave_t **head, int t);
-static void canc_caverna(Cave_t** head, int t);
+static void ins_cunicolo(Cave_t **head, int t); //adds a node
+static void canc_caverna(Cave_t **head, int t); //deletes a nodes
 // to check if creating map is done
 static int counter_a = 1;
 static int counter_h = 1;
@@ -36,8 +36,7 @@ int MainMenu(int check){
     printf(KRED"\t*BENVENUTO A DUNE*\n");
     printf(KRED"\t*                *\n");
     printf(KRED"\t******************\n\n\n");
-    clear;
-    
+    if(check == 3)check = termina_gioco(arvais, hartornen);
     printf(KMAG"--------MAIN-MENU--------\n");
     printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
     do{
@@ -56,7 +55,7 @@ int MainMenu(int check){
             check = 1;
         break;
         case 2:
-            termina_gioco();
+            check = termina_gioco(arvais, hartornen);
         break;
     }
     return check;
@@ -219,7 +218,6 @@ static void ins_cunicolo(Cave_t **head, int t){
         new->stato = 2;
     }
 
-
     new->avanti = NULL;
     new->sinistra = NULL;
     new->destra = NULL;
@@ -310,7 +308,7 @@ static int chiudi_cunicolo(){
     return s;
 }
 
-void gioca(){
+int gioca(){
     arvais.energia = 4;
     hartornen.energia = 4;
     arvais.raccolta = 0;
@@ -318,6 +316,7 @@ void gioca(){
     arvais.position = head_arvais;
     hartornen.position = head_hartornen;
     short turn;
+    short count = 1;
     int choice;
     
     clear;
@@ -362,16 +361,18 @@ void gioca(){
                 break;
                 case 2:
                     if(turn % 2 != 0){
-                        abbatti(arvais);
+                        arvais.energia--;
+                        abbatti(arvais, count);
                     }else{
-                        abbatti(hartornen);
+                        hartornen.energia--;
+                        abbatti(hartornen, count);
                     }
                 break;
                 case 3:
                     if(turn % 2 != 0){
-                        aggira(&arvais.position);
+                        aggira(arvais);
                     }else{
-                        aggira(&hartornen.position);
+                        aggira(hartornen);
                     }
                 break;
                 case 4:
@@ -391,18 +392,56 @@ void gioca(){
                 break;
             }        
         turn++;
-    }while(arvais.energia > 0 && hartornen.energia > 0);
+        count++;
+        int w = 3;
+        if(arvais.energia < 0){
+            return w;
+            printf(KYEL"!!!CONGRATULAZIONI HAI VINTO TU HARTORNEN!!!\n");
+            break;
+        }else if(hartornen.energia < 0){
+            return w;
+            printf(KYEL"!!!CONGRATULAZIONI HAI VINTO TU ARVAIS!!!\n");
+            break; 
+        }
+    }while(arvais.position != NULL && hartornen.position != NULL);
+    
+    if(arvais.energia > 0 && arvais.raccolta > 0){
+        if(arvais.raccolta > hartornen.raccolta){
+            int w = 3;
+            return w;
+            printf(KYEL"!!!CONGRATULAZIONI HAI VINTO TU ARVAIS!!!\n");
+        }else if(arvais.raccolta < hartornen.raccolta){
+            int w = 3;
+            return w;
+            printf(KYEL"!!!CONGRATULAZIONI HAI VINTO TU HARTORNEN!!!\n");
+        }else if(arvais.raccolta == hartornen.raccolta){
+            int w = 3;
+            return w;
+            printf(KYEL"IL GIOCO È FINITO IN PAREGGIO");
+        }
+    }
+    return 0;
 }
 
-void termina_gioco(){
+int termina_gioco(Scava_t player1, Scava_t player2){
     clear;
-    printf(KNRM"Termina gioco\n");
+    printf(KNRM"GAME OVER\n");
+    free(head_arvais);
+    head_arvais = NULL;
+    free(head_hartornen);
+    head_hartornen = NULL;
+    free(player1.position);
+    player1.position = NULL;
+    free(player2.position);
+    player2.position = NULL;
+    int c = 2;
+    return c;
 }
 
 static void avanza(Scava_t player){
     printf(KGRN"In questo cunicolo c'è %d di melassa ", player.position->melassa);
     printf(KGRN"Dove vuoi inserirlo?\n");
-    printf(KMAG"1-"KYEL" RACCOLTA ENERGIA\n"KMAG"2-"KYEL" RACCOLTA MELASSA\n");
+    printf(KMAG"1-"KYEL" RACCOLTA ENERGIA\n"KMAG"2-"KYEL" RACCOLTA MELASSA\n"KYEL"$ ");
     int s;
     do{
         scanf("%d", &s);
@@ -450,7 +489,7 @@ static void avanza(Scava_t player){
         break;
     }
     if(r <= 25){
-        printf(KGRN"Il prossimo cunicolo è crollato, devi iserire uno nuovo\n");
+        printf(KGRN"IL CUNICOLO SUCCESSIVO È CROLLATO, INSERISCI UNO NUOVO CUNICOLO SCEGLIENDO L' OPZIONE '4- AGGIRA'\n");
     }else{
         //moves the player one cave ahead
         if(player.position->destra == NULL && player.position->sinistra == NULL){
@@ -464,13 +503,166 @@ static void avanza(Scava_t player){
             player.position = player.position->destra;
         }
     }
+
+    char ch;
+    printf(KGRN"Premere tasto invio per proseguire\n"KYEL"$ ");
+            do{
+                scanf("%c", &ch);
+                if(ch != '\n'){
+                    if(r <= 50){
+                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                    }else{
+                        printf(KRED"Gli input devono essere '1' o '2' o '3' o '4', riprova\n"KYEL"$ ");
+                    }
+                }    
+            }while(ch != '\n'); 
 }
 
-static void abbatti(Scava_t player){
-    printf("hello\n");   
+static void abbatti(Scava_t player, short count){
+    Cave_t *new = (Cave_t*)malloc(sizeof(Cave_t));
+
+    switch(count){
+        case 1:if(r <= 5)new->stato = 3; break;
+        case 2:if(r <= 10)new->stato = 3; break;
+        case 3:if(r <= 15)new->stato = 3; break;
+        case 4:if(r <= 20)new->stato = 3; break;
+        case 5:if(r <= 25)new->stato = 3; break;
+        case 6:if(r <= 30)new->stato = 3; break;
+        case 7:if(r <= 35)new->stato = 3; break;
+        case 8:if(r <= 40)new->stato = 3; break;
+        case 9:if(r <= 45)new->stato = 3; break;
+        case 10:if(r <= 50)new->stato = 3; break;
+    }
+
+    if(r <= 40){
+        new->melassa = 0; 
+    }else if(r > 41 && r <= 80){
+        new->melassa = 1;
+    }else if(r > 81 && r <= 100){
+        new->melassa = 2;
+    }
+
+    if(r <= 40){
+        new->imprevisto = 0;
+    }else if(r > 41 && r <= 80){
+        new->imprevisto = 1;
+    }else if(r > 81 && r <= 100){
+        new->imprevisto = 2;
+    }
+
+    if(r <= 50){
+        new->stato = 0;
+    }else if(r > 51 && r <= 100){
+        new->stato = 1;
+    }
+    if(r > 81 && r <= 100){
+        new->stato = 2;
+    }
+
+    new->avanti = NULL;
+    new->sinistra = NULL;
+    new->destra = NULL;
+
+    if(player.position->destra == NULL && player.position->sinistra == NULL){
+        if(r <= 50)
+            player.position->destra = new;
+        else 
+            player.position->sinistra = new;
+    }else if(player.position->destra == NULL && player.position->avanti == NULL){
+        if(r <= 50)
+            player.position->destra = new;
+        else 
+            player.position->avanti = new;
+    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+        if(r <= 50)
+            player.position->avanti = new;
+        else 
+            player.position->sinistra = new;
+    }
+
+    int diff = 10 - count;
+    if(diff == 10 || diff == 9)
+        diff = 2;
+    int d = 1;
+    do{
+        int c;
+        clear;
+        printf(KGRN"Dove vuoi inserire il %d cunicolo?\n", d);
+        printf(KNRM"\t"KRED"1-"KBLU" AVANTI\n\t"KRED"2-"KBLU" SINISTRA\n\t"KRED"3-"KBLU" DESTRA\n"); 
+        printf(KYEL"$ ");
+        do{
+            scanf("%d", &c);
+            if(c != 1 && c != 2 && c != 3){
+                if(r <= 50){
+                    printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                }else{
+                    printf(KRED"Gli input devono essere '1' o '2' o '3', riprova\n"KYEL"$ ");
+                }
+            }
+        }while(c != 1 && c != 2 && c != 3);
+            abbatti_cunicolo(&player.position, count, c);
+        d++;        
+    }while(d <= diff);
 }
 
-static void aggira(Cave_t **head){
+static void abbatti_cunicolo(Cave_t **head, short count, int t){
+    Cave_t *new = (Cave_t*)malloc(sizeof(Cave_t));
+
+    switch(count){
+        case 1:if(r <= 5)new->stato = 3; break;
+        case 2:if(r <= 10)new->stato = 3; break;
+        case 3:if(r <= 15)new->stato = 3; break;
+        case 4:if(r <= 20)new->stato = 3; break;
+        case 5:if(r <= 25)new->stato = 3; break;
+        case 6:if(r <= 30)new->stato = 3; break;
+        case 7:if(r <= 35)new->stato = 3; break;
+        case 8:if(r <= 40)new->stato = 3; break;
+        case 9:if(r <= 45)new->stato = 3; break;
+        case 10:if(r <= 50)new->stato = 3; break;
+    }
+
+    if(r <= 40){
+        new->melassa = 0; 
+    }else if(r > 41 && r <= 80){
+        new->melassa = 1;
+    }else if(r > 81 && r <= 100){
+        new->melassa = 2;
+    }
+
+    if(r <= 40){
+        new->imprevisto = 0;
+    }else if(r > 41 && r <= 80){
+        new->imprevisto = 1;
+    }else if(r > 81 && r <= 100){
+        new->imprevisto = 2;
+    }
+
+    if(r <= 50){
+        new->stato = 0;
+    }else if(r > 51 && r <= 100){
+        new->stato = 1;
+    }
+    if(r > 81 && r <= 100){
+        new->stato = 2;
+    }
+
+    new->avanti = NULL;
+    new->sinistra = NULL;
+    new->destra = NULL;
+
+    if(t == 1){
+        new->avanti = *head;
+        *head = new;
+    }else if(t == 2){
+        new->sinistra = *head;
+        *head = new;
+    }else if(t == 3){
+        new->destra = *head;
+        *head = new;      
+    }
+}
+
+static void aggira(Scava_t player){
     Cave_t *new = (Cave_t*)malloc(sizeof(Cave_t));
 
     if(r <= 50){
@@ -501,8 +693,35 @@ static void aggira(Cave_t **head){
     new->sinistra = NULL;
     new->destra = NULL;
 
-    //finish
-
+    Cave_t* toDelete;
+    Cave_t* next;
+    if(player.position->destra == NULL && player.position->sinistra == NULL){
+        toDelete = player.position->avanti;
+    }else if(player.position->destra == NULL && player.position->avanti == NULL){
+        toDelete = player.position->sinistra;
+    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+        toDelete = player.position->destra;
+    }
+    if(toDelete->destra == NULL && toDelete->sinistra == NULL){
+       next = toDelete->avanti;
+       free(toDelete);
+       new->avanti = next; 
+    }else if(toDelete->destra == NULL && toDelete->avanti == NULL){
+       next = toDelete->sinistra;
+       free(toDelete);
+       new->sinistra = next; 
+    }else if(toDelete->avanti == NULL && toDelete->sinistra == NULL){
+       next = toDelete->destra;
+       free(toDelete);
+       new->destra = next; 
+    }
+    if(player.position->destra == NULL && player.position->sinistra == NULL){
+        player.position->avanti = new;
+    }else if(player.position->destra == NULL && player.position->avanti == NULL){
+        player.position->sinistra = new;
+    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+        player.position->destra = new;
+    }
 }
 
 static void esci(Scava_t player){

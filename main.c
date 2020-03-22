@@ -14,8 +14,13 @@ int main(){
             check = MainMenu(check);
         } while (!check);
         clear;
-        gioca();
-        
+        if(check == 2)
+        break;
+        else
+            check = gioca();
+        if(check == 3)
+            break;
+
     } while (1);
     
 }

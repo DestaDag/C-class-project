@@ -11,10 +11,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-int MainMenu(int check);
-void termina_gioco();
-void gioca();
-
 #define clear  printf("\e[1;1H\e[2J")
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
@@ -65,3 +61,7 @@ struct Scavatrice{
 
 typedef struct Caverna Cave_t;
 typedef struct Scavatrice Scava_t;
+
+int MainMenu(int check);
+int termina_gioco(Scava_t player1, Scava_t player2);
+int gioca();
