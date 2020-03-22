@@ -18,7 +18,7 @@ static void stampa_cunicolo(Cave_t* first);
 static int chiudi_cunicolo();
 static void avanza(Scava_t player);
 static void abbatti(Scava_t player);
-static void aggira(Scava_t player);
+static void aggira(Cave_t **head);
 static void esci();
 static void ins_cunicolo(Cave_t **head, int t);
 static void canc_caverna(Cave_t** head, int t);
@@ -369,18 +369,29 @@ void gioca(){
                 break;
                 case 3:
                     if(turn % 2 != 0){
-                        aggira(arvais);
+                        aggira(&arvais.position);
                     }else{
-                        aggira(hartornen);
+                        aggira(&hartornen.position);
                     }
                 break;
                 case 4:
-                    esci();
+                    if(turn % 2 != 0){
+                        if(arvais.position->stato == 3)
+                            esci();
+                        else{
+                            printf(KGRN"Non puoi uscire");
+                        }
+                    }else{
+                        if(hartornen.position->stato == 3)
+                            esci();
+                        else{
+                            printf(KGRN"Non puoi uscire");
+                        }
+                    }
                 break;
             }        
         turn++;
     }while(arvais.energia > 0 && hartornen.energia > 0);
-    
 }
 
 void termina_gioco(){
@@ -389,18 +400,6 @@ void termina_gioco(){
 }
 
 static void avanza(Scava_t player){
-    //moves the player one cave ahead
-    if(player.position->destra == NULL && player.position->sinistra == NULL){
-        printf("Ti sei spostato di un cunicolo in avanti\n");
-        player.position = player.position->avanti;
-    }else if(player.position->destra == NULL && player.position->avanti == NULL){
-        printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n");
-        player.position = player.position->sinistra;
-    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
-        printf(KGRN"Ti sei spostato di un cunicolo a destra\n");
-        player.position = player.position->destra;
-    }
-    
     printf(KGRN"In questo cunicolo c'è %d di melassa ", player.position->melassa);
     printf(KGRN"Dove vuoi inserirlo?\n");
     printf(KMAG"1-"KYEL" RACCOLTA ENERGIA\n"KMAG"2-"KYEL" RACCOLTA MELASSA\n");
@@ -415,7 +414,7 @@ static void avanza(Scava_t player){
             }
         }    
     }while(s != 1 && s != 2);
-    
+
     if(s == 1){
         player.energia += player.position->melassa;
     }else{
@@ -424,21 +423,16 @@ static void avanza(Scava_t player){
             player.energia += player.position->melassa;        
         }
         player.raccolta += player.position->melassa;
-
     }
 
-    switch(player.position->stato){
-        case 0://normale
-            printf(KGRN"Sei in un cunicolo normale\n");
-        break;
-        case 1://speciale
-            printf(KGRN"Questo cunicolo irradia melassa, hai ottenuto 1 unità di melassa\n");
-            player.energia++;
-        break;
-        case 2://accidentata
-            printf(KGRN"Questo cunicolo ti ha perso 1 unità di melassa\n");
-            player.energia--;
-        break;
+    if(player.position->stato ==  0){//normale
+        printf(KGRN"Sei in un cunicolo normale\n");
+    }else if(player.position->stato == 1){
+        printf(KGRN"Questo cunicolo irradia melassa, hai ottenuto 1 unità di melassa\n");
+        player.energia++;          
+    }else if(player.position->stato == 2){
+        printf(KGRN"Questo cunicolo ti ha perso 1 unità di melassa\n");
+        player.energia--;           
     }
 
     switch(player.position->imprevisto){
@@ -455,15 +449,58 @@ static void avanza(Scava_t player){
             printf(KGRN"Il baco ha divorato tutta la tua melassa\n");
         break;
     }
-
+    if(r <= 25){
+        printf(KGRN"Il prossimo cunicolo è crollato, devi iserire uno nuovo\n");
+    //moves the player one cave ahead
+    if(player.position->destra == NULL && player.position->sinistra == NULL){
+        printf("Ti sei spostato di un cunicolo in avanti\n");
+        player.position = player.position->avanti;
+    }else if(player.position->destra == NULL && player.position->avanti == NULL){
+        printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n");
+        player.position = player.position->sinistra;
+    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+        printf(KGRN"Ti sei spostato di un cunicolo a destra\n");
+        player.position = player.position->destra;
+    }
+    }
 }
 
 static void abbatti(Scava_t player){
     printf("hello\n");   
 }
 
-static void aggira(Scava_t player){
-    printf("hello\n");
+static void aggira(Cave_t **head){
+    Cave_t *new = (Cave_t*)malloc(sizeof(Cave_t));
+
+    if(r <= 50){
+        new->melassa = 0; 
+    }else if(r > 51 && r <= 70){
+        new->melassa = 1;
+    }else if(r > 71 && r <= 100){
+        new->melassa = 2;
+    }
+
+    if(r <= 50){
+        new->imprevisto = 0;
+    }else if(r > 51 && r <= 85){
+        new->imprevisto = 1;
+    }else if(r > 86 && r <= 100){
+        new->imprevisto = 2;
+    }
+
+    if(r <= 50){
+        new->stato = 0;
+    }else if(r > 51 && r <= 85){
+        new->stato = 1;
+    }else if(r > 86 && r <= 100){
+        new->stato = 2;
+    }
+
+    new->avanti = NULL;
+    new->sinistra = NULL;
+    new->destra = NULL;
+
+    //finish
 
 }
 
