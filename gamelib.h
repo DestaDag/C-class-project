@@ -53,7 +53,8 @@ struct Caverna{
     struct Caverna *sinistra;
     struct Caverna *destra;
     Qm_t melassa;
-    Tp_t  stato;  
+    Tp_t  stato;
+    Ti_t imprevisto;  
 };
 
 struct Scavatrice{

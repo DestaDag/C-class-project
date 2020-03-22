@@ -13,22 +13,16 @@ static Scava_t arvais;
 static Scava_t hartornen;
 
 #define r rand()%101
-//function for creating, deleting and printing linked list
 static void crea_cunicolo();
-//outputs the linked list
 static void stampa_cunicolo(Cave_t* first);
-//function for exiting from the map creation menu
 static int chiudi_cunicolo();
-//static void avanza();
-//static void abbatti();
-//static void aggira();
+static void avanza(Scava_t player);
+static void abbatti();
+static void aggira();
 //static void esci();
-//creates the two structures
 static void ins_cunicolo(Cave_t **head, int t);
-//deletes the last node
-static void  canc_caverna(Cave_t** head, int t);
+static void canc_caverna(Cave_t** head, int t);
 // to check if creating map is done
-static int control = 0;
 static int counter_a = 1;
 static int counter_h = 1;
 //to check if canc_caverna() has been called
@@ -46,7 +40,16 @@ int MainMenu(int check){
     
     printf(KMAG"--------MAIN-MENU--------\n");
     printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
-    scanf("%d", &choice); 
+    do{
+        scanf("%d", &choice);
+        if(choice != 1 && choice != 2){
+            if(r <= 50){
+               printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+            }else{
+                printf(KRED"Gli input devono essere '1' o '2', riprova\n"KYEL"$ ");
+            }
+        }    
+    }while(choice != 1 && choice != 2);
     switch (choice){
         case 1:
             crea_cunicolo();
@@ -65,7 +68,16 @@ static void crea_cunicolo(){
     do{
         printf(KMAG"\n\n--------MAP-CREATION-MENU-------\n");
         printf(KNRM"\t"KRED"1-"KBLU" INSERISCI CUNICOLO\n\t"KRED"2-"KBLU" ELIMINA CUNICOLO\n\t"KRED"3-"KBLU" STAMPA CUNICOLO\n\t"KRED"4-"KBLU" RITORNA AL MAIN MENU\n"KYEL"$ ");
-        scanf("%d", &choice);
+        do{
+            scanf("%d", &choice);
+            if(choice != 1 && choice != 2 && choice != 3 && choice != 4){
+                if(r <= 50){
+                    printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                }else{
+                    printf(KRED"Gli input devono essere '1' o '2' o '3' o '4', riprova\n"KYEL"$ ");
+                }
+            }    
+        }while(choice != 1 && choice != 2 && choice != 3 && choice != 4);
         if(choice  == 2){
             if(delete_check == false){
                 if(counter_a == 1)
@@ -127,8 +139,7 @@ static void crea_cunicolo(){
                         }
                     }while(c != 1 && c != 2 && c != 3);
                     ins_cunicolo(&head_hartornen, c);
-                }
-                control = 1;            
+                }          
                 if(counter_h == 11 && counter_a == 1){
                     clear;
                     printf(KGRN"Sono state create 10 cunicoli per entrambe le famiglie\nSi puo` proseguire con il gioco\n");
@@ -193,12 +204,21 @@ static void ins_cunicolo(Cave_t **head, int t){
     }
     
     if(r <= 50){
+        new->imprevisto = 0;
+    }else if(r > 51 && r <= 85){
+        new->imprevisto = 1;
+    }else if(r > 86 && r <= 100){
+        new->imprevisto = 2;
+    }
+
+    if(r <= 50){
         new->stato = 0;
     }else if(r > 51 && r <= 85){
         new->stato = 1;
     }else if(r > 86 && r <= 100){
         new->stato = 2;
-    }    
+    }
+
 
     new->avanti = NULL;
     new->sinistra = NULL;
@@ -291,27 +311,94 @@ static int chiudi_cunicolo(){
 }
 
 void gioca(){
+    arvais.energia = 4;
+    hartornen.energia = 4;
+    arvais.position = head_arvais;
+    hartornen.position = head_hartornen;
+    short turn;
+    int choice;
+    
     clear;
-    if(r <= 50)
-        printf(KGRN"Il turno lo inizia ARVAIS\n");
-    else 
-        printf(KGRN"Il turno lo inizia HARTORNEN\n");
+    if(r <= 50){
+        printf(KGRN"Il gioco lo inizia ARVAIS\n");
+        turn = 1;
+    }else{ 
+        printf(KGRN"Il gioco lo inizia HARTORNEN\n");
+        turn = 2;
+    }
 
+    do{
+        if(turn % 2 != 0){
+            clear;
+            printf(KGRN"Cosa vuoi fare ARVAIS?\n");
+        }else{
+            clear;
+            printf(KGRN"Cosa vuoi fare HARTORNEN?\n");
+        }
+            printf(KNRM"\t"KRED"1-"KBLU" AVANZA\n\t"KRED"2-"KBLU" ABBATTI\n"KRED"3-"KBLU" AGGIRA"KRED"4-"KBLU" ESCI\n"KYEL"$ ");
+            do{
+                scanf("%d", &choice);
+                if(choice != 1 && choice != 2 && choice != 3 && choice != 4){
+                    if(r <= 50){
+                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                    }else{
+                        printf(KRED"Gli input devono essere '1' o '2' o '3' o '4', riprova\n"KYEL"$ ");
+                    }
+                }    
+            }while(choice != 1 && choice != 2 && choice != 3 && choice != 4);
+            switch(choice){
+                case 1:
+                    if(turn % 2 != 0){
+                        avanza(arvais);
+                    }else{
+                        avanza(hartornen);
+                    }
+                break;
+                case 2:
+                    if(turn % 2 != 0){
 
+                    }else{
 
+                    }
+                break;
+                case 3:
+                    if(turn % 2 != 0){
 
+                    }else{
 
+                    }
+                break;
+                case 4:
+                    if(turn % 2 != 0){
 
+                    }else{
 
-
-
-
-
-
-
+                    }
+                break;
+            }        
+        turn++;
+    }while(arvais.energia > 0 && hartornen.energia > 0);
+    
 }
 
 void termina_gioco(){
     clear;
     printf(KNRM"Termina gioco\n");
+}
+
+static void avanza(Scava_t player){
+    printf("hello\n");
+
+
+}
+
+static void abbatti(){
+    printf("hello\n");
+
+   
+}
+
+static void aggira(){
+    printf("hello\n");
+
 }
