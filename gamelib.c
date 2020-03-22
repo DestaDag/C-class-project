@@ -17,9 +17,9 @@ static void crea_cunicolo();
 static void stampa_cunicolo(Cave_t* first);
 static int chiudi_cunicolo();
 static void avanza(Scava_t player);
-static void abbatti();
-static void aggira();
-//static void esci();
+static void abbatti(Scava_t player);
+static void aggira(Scava_t player);
+static void esci();
 static void ins_cunicolo(Cave_t **head, int t);
 static void canc_caverna(Cave_t** head, int t);
 // to check if creating map is done
@@ -313,6 +313,8 @@ static int chiudi_cunicolo(){
 void gioca(){
     arvais.energia = 4;
     hartornen.energia = 4;
+    arvais.raccolta = 0;
+    hartornen.raccolta = 0;
     arvais.position = head_arvais;
     hartornen.position = head_hartornen;
     short turn;
@@ -330,12 +332,16 @@ void gioca(){
     do{
         if(turn % 2 != 0){
             clear;
-            printf(KGRN"Cosa vuoi fare ARVAIS?\n");
+            printf(KRED"-------ARVAIS-------\n");
+            printf(KWHT"%d: \t"KRED"ENERGIA\n"KWHT"%d: \t"KRED"RACCOLTA\n",arvais.energia, arvais.raccolta);
+            printf(KGRN"Cosa vuoi fare ARVAIS?\n\n");
         }else{
             clear;
-            printf(KGRN"Cosa vuoi fare HARTORNEN?\n");
+            printf(KBLU"-------HARTORNEN-------\n");
+            printf(KWHT"%d: \t"KBLU"ENERGIA\n"KWHT"%d: \t"KBLU"RACCOLTA\n",hartornen.energia, hartornen.raccolta);
+            printf(KGRN"Cosa vuoi fare HARTORNEN?\n\n");
         }
-            printf(KNRM"\t"KRED"1-"KBLU" AVANZA\n\t"KRED"2-"KBLU" ABBATTI\n"KRED"3-"KBLU" AGGIRA"KRED"4-"KBLU" ESCI\n"KYEL"$ ");
+            printf(KNRM"\t"KRED"1-"KBLU" AVANZA\n\t"KRED"2-"KBLU" ABBATTI\n\t"KRED"3-"KBLU" AGGIRA\n\t"KRED"4-"KBLU" ESCI\n"KYEL"$ ");
             do{
                 scanf("%d", &choice);
                 if(choice != 1 && choice != 2 && choice != 3 && choice != 4){
@@ -356,24 +362,20 @@ void gioca(){
                 break;
                 case 2:
                     if(turn % 2 != 0){
-
+                        abbatti(arvais);
                     }else{
-
+                        abbatti(hartornen);
                     }
                 break;
                 case 3:
                     if(turn % 2 != 0){
-
+                        aggira(arvais);
                     }else{
-
+                        aggira(hartornen);
                     }
                 break;
                 case 4:
-                    if(turn % 2 != 0){
-
-                    }else{
-
-                    }
+                    esci();
                 break;
             }        
         turn++;
@@ -387,18 +389,85 @@ void termina_gioco(){
 }
 
 static void avanza(Scava_t player){
-    printf("hello\n");
+    //moves the player one cave ahead
+    if(player.position->destra == NULL && player.position->sinistra == NULL){
+        printf("Ti sei spostato di un cunicolo in avanti\n");
+        player.position = player.position->avanti;
+    }else if(player.position->destra == NULL && player.position->avanti == NULL){
+        printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n");
+        player.position = player.position->sinistra;
+    }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+        printf(KGRN"Ti sei spostato di un cunicolo a destra\n");
+        player.position = player.position->destra;
+    }
+    
+    printf(KGRN"In questo cunicolo c'è %d di melassa ", player.position->melassa);
+    printf(KGRN"Dove vuoi inserirlo?\n");
+    printf(KMAG"1-"KYEL" RACCOLTA ENERGIA\n"KMAG"2-"KYEL" RACCOLTA MELASSA\n");
+    int s;
+    do{
+        scanf("%d", &s);
+        if(s != 1 && s != 2){
+            if(r <= 50){
+                printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+            }else{
+                printf(KRED"Gli input devono essere '1' o '2', riprova\n"KYEL"$ ");
+            }
+        }    
+    }while(s != 1 && s != 2);
+    
+    if(s == 1){
+        player.energia += player.position->melassa;
+    }else{
+        if(player.raccolta == 10){
+            printf(KGRN"Il serbatoio di energia è pieno, la melassa è messa nella raccolta\n");
+            player.energia += player.position->melassa;        
+        }
+        player.raccolta += player.position->melassa;
 
+    }
+
+    switch(player.position->stato){
+        case 0://normale
+            printf(KGRN"Sei in un cunicolo normale\n");
+        break;
+        case 1://speciale
+            printf(KGRN"Questo cunicolo irradia melassa, hai ottenuto 1 unità di melassa\n");
+            player.energia++;
+        break;
+        case 2://accidentata
+            printf(KGRN"Questo cunicolo ti ha perso 1 unità di melassa\n");
+            player.energia--;
+        break;
+    }
+
+    switch(player.position->imprevisto){
+        case 0://nessun imprevisto
+            printf(KGRN"Non c'è nessun pericolo in questo cunicolo\n");
+        break;
+        case 1://crollo
+            printf(KGRN"Accidenti ti si è crollato addosso il cunicolo, hai cosumato 1 unità di melassa e sei uscito dalle macerie\n");
+            player.energia--;
+        break;
+        case 2://baco
+            player.energia = 0;
+            player.raccolta = 0;
+            printf(KGRN"Il baco ha divorato tutta la tua melassa\n");
+        break;
+    }
 
 }
 
-static void abbatti(){
-    printf("hello\n");
-
-   
+static void abbatti(Scava_t player){
+    printf("hello\n");   
 }
 
-static void aggira(){
+static void aggira(Scava_t player){
     printf("hello\n");
 
+}
+
+static void esci(Scava_t player){
+    printf("hello\n");
+    
 }
