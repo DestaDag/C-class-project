@@ -16,9 +16,9 @@ static void crea_cunicolo();    //creation menu
 static void stampa_cunicolo(Cave_t* first); //prints  created caves 
 static int chiudi_cunicolo();   //closes the  creation menu
 static void avanza(Scava_t player); //moves the player to the next cave
-static void abbatti(Scava_t player, short count);
-static void abbatti_cunicolo(Cave_t **head, short count, int t);
-static void aggira(Scava_t player); // adds a node if the node gets destroyed
+static void abbatti(Scava_t player, short count); //adds a cave with new properties in a new direction
+static void abbatti_cunicolo(Cave_t **head, short count, int t);// adds nodes with the above properties
+static void aggira(Scava_t player); //adds a node if the node gets destroyed
 static void esci();
 static void ins_cunicolo(Cave_t **head, int t); //adds a node
 static void canc_caverna(Cave_t **head, int t); //deletes a nodes
@@ -188,7 +188,7 @@ static void crea_cunicolo(){
                     }
                 } 
         }
-    }while(choice != 4);  
+    }while(choice != 5);  
 }
 
 static void ins_cunicolo(Cave_t **head, int t){
@@ -299,7 +299,7 @@ static int chiudi_cunicolo(){
             return s;
             clear;
         }else if(temp == 1){
-            s = 4;
+            s = 5;
         }else{
             clear;
             printf("Valore non riconosciuto...reinserisci la tua risposta\n");
@@ -320,22 +320,21 @@ int gioca(){
     int choice;
     
     clear;
-    if(r <= 50){
-        printf(KGRN"Il gioco lo inizia ARVAIS\n");
-        turn = 1;
-    }else{ 
-        printf(KGRN"Il gioco lo inizia HARTORNEN\n");
-        turn = 2;
+    if(count == 1){
+        if(r <= 50){
+            printf(KGRN"Il gioco lo inizia ARVAIS\n");
+            turn = 1;
+        }else{ 
+            printf(KGRN"Il gioco lo inizia HARTORNEN\n");
+            turn = 2;
+        }
     }
-
     do{
         if(turn % 2 != 0){
-            clear;
             printf(KRED"-------ARVAIS-------\n");
             printf(KWHT"%d: \t"KRED"ENERGIA\n"KWHT"%d: \t"KRED"RACCOLTA\n",arvais.energia, arvais.raccolta);
             printf(KGRN"Cosa vuoi fare ARVAIS?\n\n");
         }else{
-            clear;
             printf(KBLU"-------HARTORNEN-------\n");
             printf(KWHT"%d: \t"KBLU"ENERGIA\n"KWHT"%d: \t"KBLU"RACCOLTA\n",hartornen.energia, hartornen.raccolta);
             printf(KGRN"Cosa vuoi fare HARTORNEN?\n\n");
@@ -474,48 +473,33 @@ static void avanza(Scava_t player){
         player.energia--;           
     }
 
-    switch(player.position->imprevisto){
-        case 0://nessun imprevisto
-            printf(KGRN"Non c'è nessun pericolo in questo cunicolo\n");
-        break;
-        case 1://crollo
-            printf(KGRN"Accidenti ti si è crollato addosso il cunicolo, hai cosumato 1 unità di melassa e sei uscito dalle macerie\n");
-            player.energia--;
-        break;
-        case 2://baco
+    if(player.position->imprevisto == 0){
+        printf(KGRN"Non c'è nessun pericolo in questo cunicolo\n");
+    }else if(player.position->imprevisto == 1){
+        printf(KGRN"Accidenti ti si è crollato addosso il cunicolo, hai cosumato 1 unità di melassa e sei uscito dalle macerie\n");
+        player.energia--;
+    }else if(player.position->imprevisto == 2){
             player.energia = 0;
             player.raccolta = 0;
             printf(KGRN"Il baco ha divorato tutta la tua melassa\n");
-        break;
     }
+
     if(r <= 25){
         printf(KGRN"IL CUNICOLO SUCCESSIVO È CROLLATO, INSERISCI UNO NUOVO CUNICOLO SCEGLIENDO L' OPZIONE '4- AGGIRA'\n");
     }else{
         //moves the player one cave ahead
         if(player.position->destra == NULL && player.position->sinistra == NULL){
-            printf("Ti sei spostato di un cunicolo in avanti\n");
+            printf("Ti sei spostato di un cunicolo in avanti\n\n");
             player.position = player.position->avanti;
         }else if(player.position->destra == NULL && player.position->avanti == NULL){
-            printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n");
+            printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n\n");
             player.position = player.position->sinistra;
         }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
-            printf(KGRN"Ti sei spostato di un cunicolo a destra\n");
+            printf(KGRN"Ti sei spostato di un cunicolo a destra\n\n");
             player.position = player.position->destra;
         }
     }
 
-    char ch;
-    printf(KGRN"Premere tasto invio per proseguire\n"KYEL"$ ");
-            do{
-                scanf("%c", &ch);
-                if(ch != '\n'){
-                    if(r <= 50){
-                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
-                    }else{
-                        printf(KRED"Gli input devono essere '1' o '2' o '3' o '4', riprova\n"KYEL"$ ");
-                    }
-                }    
-            }while(ch != '\n'); 
 }
 
 static void abbatti(Scava_t player, short count){
