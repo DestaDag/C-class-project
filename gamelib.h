@@ -10,7 +10,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
+#include <unistd.h>
 
+#define pause  sleep(2)
 #define clear  printf("\e[1;1H\e[2J")
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"

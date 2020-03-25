@@ -15,27 +15,43 @@ static Scava_t hartornen;
 static void crea_cunicolo();    //creation menu
 static void stampa_cunicolo(Cave_t* first); //prints  created caves 
 static int chiudi_cunicolo();   //closes the  creation menu
-static void avanza(Scava_t player); //moves the player to the next cave
+static void avanza(Cave_t **cave, Scava_t *player); //moves the player to the next cave
 static void abbatti(Scava_t player, short count); //adds a cave with new properties in a new direction
 static void abbatti_cunicolo(Cave_t **head, short count, int t);// adds nodes with the above properties
 static void aggira(Scava_t player); //adds a node if the node gets destroyed
 static void esci();
 static void ins_cunicolo(Cave_t **head, int t); //adds a node
 static void canc_caverna(Cave_t **head, int t); //deletes a nodes
+static void loading();
 // to check if creating map is done
 static int counter_a = 1;
 static int counter_h = 1;
 //to check if canc_caverna() has been called
 bool delete_check;
 
+static void loading(){
+    clear;
+    pause;
+    printf(KWHT"\n\nLOADING.");
+    sleep(1);
+    clear;
+    printf(KWHT"\n\nLOADING..");
+    sleep(1);
+    clear;
+    printf(KWHT"\n\nLOADING...");
+    pause;
+    clear;    
+}
+
 int MainMenu(int check){
     int choice = 0;
-    clear;
+    clear; 
     printf(KRED"\t******************\n");
     printf(KRED"\t*                *\n");
     printf(KRED"\t*BENVENUTO A DUNE*\n");
     printf(KRED"\t*                *\n");
-    printf(KRED"\t******************\n\n\n");
+    printf(KRED"\t******************\n");
+    loading();
     if(check == 3)check = termina_gioco(arvais, hartornen);
     printf(KMAG"--------MAIN-MENU--------\n");
     printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
@@ -59,12 +75,14 @@ int MainMenu(int check){
         break;
     }
     return check;
+    loading();
 }
 
 static void crea_cunicolo(){
     int choice = 0;
     int c;
     do{
+        clear;
         printf(KMAG"\n\n--------MAP-CREATION-MENU-------\n");
         printf(KNRM"\t"KRED"1-"KBLU" INSERISCI CUNICOLO\n\t"KRED"2-"KBLU" ELIMINA CUNICOLO\n\t"KRED"3-"KBLU" STAMPA CUNICOLO\n\t"KRED"4-"KBLU" RITORNA AL MAIN MENU\n"KYEL"$ ");
         do{
@@ -174,6 +192,7 @@ static void crea_cunicolo(){
                 stampa_cunicolo(head_arvais);
                 printf(KGRN"\nEcco i cunicoli creati per la famiglia HARTORNEN con le loro rispettive quantita di melassa\n");
                 stampa_cunicolo(head_hartornen);
+                pause;
             break;
             case 4:
                 if(counter_h == 11 && counter_a == 11){
@@ -186,7 +205,9 @@ static void crea_cunicolo(){
                         clear;
                         printf(KRED"Ricordati che i cunicoli per entrambe le famiglie devono essere dieci!\n");
                     }
-                } 
+                }
+                loading();
+            break; 
         }
     }while(choice != 5);  
 }
@@ -258,7 +279,8 @@ static void stampa_cunicolo(Cave_t *first){
             if(c > 10)
                 break;
         }while(scan != NULL);
-    } 
+
+    }
 }
 
 static void canc_caverna(Cave_t **head, int t){
@@ -330,6 +352,7 @@ int gioca(){
         }
     }
     do{
+        printf(KWHT"È il turno di: \n");
         if(turn % 2 != 0){
             printf(KRED"-------ARVAIS-------\n");
             printf(KWHT"%d: \t"KRED"ENERGIA\n"KWHT"%d: \t"KRED"RACCOLTA\n",arvais.energia, arvais.raccolta);
@@ -353,9 +376,9 @@ int gioca(){
             switch(choice){
                 case 1:
                     if(turn % 2 != 0){
-                        avanza(arvais);
+                        avanza(&arvais.position, &arvais);
                     }else{
-                        avanza(hartornen);
+                        avanza(&hartornen.position, &hartornen);
                     }
                 break;
                 case 2:
@@ -373,19 +396,20 @@ int gioca(){
                     }else{
                         aggira(hartornen);
                     }
+                    clear;
                 break;
                 case 4:
                     if(turn % 2 != 0){
                         if(arvais.position->stato == 3)
                             esci();
                         else{
-                            printf(KGRN"Non puoi uscire");
+                            printf(KGRN"Non puoi uscire\n");
                         }
                     }else{
                         if(hartornen.position->stato == 3)
                             esci();
                         else{
-                            printf(KGRN"Non puoi uscire");
+                            printf(KGRN"Non puoi uscire\n");
                         }
                     }
                 break;
@@ -437,69 +461,78 @@ int termina_gioco(Scava_t player1, Scava_t player2){
     return c;
 }
 
-static void avanza(Scava_t player){
-    printf(KGRN"In questo cunicolo c'è %d di melassa ", player.position->melassa);
-    printf(KGRN"Dove vuoi inserirlo?\n");
-    printf(KMAG"1-"KYEL" RACCOLTA ENERGIA\n"KMAG"2-"KYEL" RACCOLTA MELASSA\n"KYEL"$ ");
+static void avanza(Cave_t **cave, Scava_t *player){
     int s;
-    do{
-        scanf("%d", &s);
-        if(s != 1 && s != 2){
-            if(r <= 50){
-                printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
-            }else{
+    clear;
+    if((*cave)->melassa  != 0){
+        printf(KGRN"In questo cunicolo c'è %d di melassa ", (*cave)->melassa);
+        printf(KGRN"Dove vuoi inserirlo?\n");
+        printf(KMAG"1-"KYEL" RACCOLTA ENERGIA\n"KMAG"2-"KYEL" RACCOLTA MELASSA\n"KYEL"$ ");
+
+        do{
+            scanf("%d", &s);
+            if(s != 1 && s != 2){
+                if(r <= 50){
+                    printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                }else{
                 printf(KRED"Gli input devono essere '1' o '2', riprova\n"KYEL"$ ");
-            }
-        }    
-    }while(s != 1 && s != 2);
+                }
+            }    
+        }while(s != 1 && s != 2);
+    }else printf(KGRN"Non c'è melassa nella cunicolo\n");
 
     if(s == 1){
-        player.energia += player.position->melassa;
+        player->energia += (*cave)->melassa;
     }else{
-        if(player.raccolta == 10){
+        if(player->raccolta == 10){
             printf(KGRN"Il serbatoio di energia è pieno, la melassa è messa nella raccolta\n");
-            player.energia += player.position->melassa;        
+            player->energia += (*cave)->melassa;        
         }
-        player.raccolta += player.position->melassa;
+        player->raccolta += (*cave)->melassa;
     }
 
-    if(player.position->stato ==  0){//normale
+    if((*cave)->stato ==  0){//normale
         printf(KGRN"Sei in un cunicolo normale\n");
-    }else if(player.position->stato == 1){
+    }
+    if((*cave)->stato == 1){
         printf(KGRN"Questo cunicolo irradia melassa, hai ottenuto 1 unità di melassa\n");
-        player.energia++;          
-    }else if(player.position->stato == 2){
+        player->energia += 1;          
+    }
+    if((*cave)->stato == 2){
         printf(KGRN"Questo cunicolo ti ha perso 1 unità di melassa\n");
-        player.energia--;           
+        player->energia -= 1;           
     }
 
-    if(player.position->imprevisto == 0){
+    if((*cave)->imprevisto == 0){
         printf(KGRN"Non c'è nessun pericolo in questo cunicolo\n");
-    }else if(player.position->imprevisto == 1){
+    }
+    if((*cave)->imprevisto == 1){
         printf(KGRN"Accidenti ti si è crollato addosso il cunicolo, hai cosumato 1 unità di melassa e sei uscito dalle macerie\n");
-        player.energia--;
-    }else if(player.position->imprevisto == 2){
-            player.energia = 0;
-            player.raccolta = 0;
+        player->energia -= 1;
+    }
+    if((*cave)->imprevisto == 2){
+            player->energia = 0;
+            player->raccolta = 0;
             printf(KGRN"Il baco ha divorato tutta la tua melassa\n");
     }
 
     if(r <= 25){
-        printf(KGRN"IL CUNICOLO SUCCESSIVO È CROLLATO, INSERISCI UNO NUOVO CUNICOLO SCEGLIENDO L' OPZIONE '4- AGGIRA'\n");
+        printf(KGRN"IL CUNICOLO SUCCESSIVO È CROLLATO,NEL TUO PROSSIMO TURNO INSERISCI UNO NUOVO CUNICOLO SCEGLIENDO L' OPZIONE '4- AGGIRA'\n\n");
     }else{
         //moves the player one cave ahead
-        if(player.position->destra == NULL && player.position->sinistra == NULL){
+        if((*cave)->destra == NULL && (*cave)->sinistra == NULL){
             printf("Ti sei spostato di un cunicolo in avanti\n\n");
-            player.position = player.position->avanti;
-        }else if(player.position->destra == NULL && player.position->avanti == NULL){
+            (*cave) = (*cave)->avanti;
+        }else if((*cave)->destra == NULL && (*cave)->avanti == NULL){
             printf(KGRN"Ti sei spostato di un cunicolo a sinistra\n\n");
-            player.position = player.position->sinistra;
-        }else if(player.position->avanti == NULL && player.position->sinistra == NULL){
+            (*cave)= (*cave)->sinistra;
+        }else if((*cave)->avanti == NULL && (*cave)->sinistra == NULL){
             printf(KGRN"Ti sei spostato di un cunicolo a destra\n\n");
-            player.position = player.position->destra;
+            (*cave) = (*cave)->destra;
         }
     }
-
+    clear;
+    pause;
 }
 
 static void abbatti(Scava_t player, short count){
