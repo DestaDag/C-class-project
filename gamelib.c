@@ -1,7 +1,6 @@
 /*
     DESTA DAGIM AYENEW
     MATRICOLA: 314650
-    v: 0.1.0
 */
 
 #include "gamelib.h"
@@ -11,7 +10,7 @@ static Cave_t* head_hartornen = NULL;
 static Scava_t arvais;
 static Scava_t hartornen;
 
-#define r rand()%101    //seed for generating random numbers
+#define r rand()%101
 static void crea_cunicolo();    //creation menu
 static void stampa_cunicolo(Cave_t* first); //prints  created caves 
 static int chiudi_cunicolo();   //closes the  creation menu
@@ -19,28 +18,30 @@ static void avanza(Cave_t **cave, Scava_t *player); //moves the player to the ne
 static void abbatti(Scava_t player, short count); //adds a cave with new properties in a new direction
 static void abbatti_cunicolo(Cave_t **head, short count, int t);// adds nodes with the above properties
 static void aggira(Scava_t player); //adds a node if the node gets destroyed
-static void esci();
+static void esci(Cave_t **cave, Scava_t *player);//player exit the cave structure
 static void ins_cunicolo(Cave_t **head, int t); //adds a node
 static void canc_caverna(Cave_t **head, int t); //deletes a nodes
-static void loading();
+static bool scontro_finale(Scava_t*player); //handles the final battle
+static void set(Cave_t **cave, Scava_t*player, Cave_t **cave2, Scava_t*player2); //sets default values
 // to check if creating map is done
 static int counter_a = 1;
 static int counter_h = 1;
 //to check if canc_caverna() has been called
 bool delete_check;
 
-static void loading(){
-    clear;
-    pause;
-    printf(KWHT"\n\nLOADING.");
-    sleep(1);
-    clear;
-    printf(KWHT"\n\nLOADING..");
-    sleep(1);
-    clear;
-    printf(KWHT"\n\nLOADING...");
-    pause;
-    clear;    
+static void set(Cave_t **cave, Scava_t*player, Cave_t **cave2, Scava_t*player2){
+    player->energia = 4;
+    player2->energia = 4;
+    player->raccolta = 0;
+    player2->raccolta = 0;
+    (*cave) = head_arvais;
+    (*cave2) = head_hartornen;
+    for(int i = 0; i <= 10; i++){
+        if(r <= 25){
+            player->ammo += 1;
+            player2->ammo += 1;
+        }
+    }
 }
 
 int MainMenu(int check){
@@ -51,7 +52,6 @@ int MainMenu(int check){
     printf(KRED"\t*BENVENUTO A DUNE*\n");
     printf(KRED"\t*                *\n");
     printf(KRED"\t******************\n");
-    loading();
     if(check == 3)check = termina_gioco(arvais, hartornen);
     printf(KMAG"--------MAIN-MENU--------\n");
     printf(KNRM"\t"KRED"1-"KBLU" CREA CUNICOLI\n\t"KRED"2-"KBLU" TERMINA GIOCO\n"KYEL"$ ");
@@ -75,7 +75,8 @@ int MainMenu(int check){
         break;
     }
     return check;
-    loading();
+    clear;
+    pause;
 }
 
 static void crea_cunicolo(){
@@ -111,11 +112,12 @@ static void crea_cunicolo(){
         switch(choice){
             case 1:
                 /*
-                *   PER CREARE CUNICOLI PER LA FAMIGLIA ARVAIS
+                *   creates caves for ARVAIS character
                 */
-                if(counter_a >= 11)
+                if(counter_a >= 11){
                     printf(KRED"Sono state create 10 cunicoli per la famiglia ARVAIS\n");
-                else{
+                    pause;
+                }else{
                     clear;
                     printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia ARVAIS:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_a);
                     ++counter_a;
@@ -135,11 +137,12 @@ static void crea_cunicolo(){
                     ins_cunicolo(&head_arvais, c);
                 }
                 /*
-                *   PER CREARE CUNICOLI PER LA FAMIGLIA HARTORNEN
+                *   creates caves for HARTORNEN character
                 */
-                if(counter_h >= 11)
+                if(counter_h >= 11){
                     printf(KRED"Sono state create 10 cunicoli per la famiglia HARTORNEN\n");
-                else{
+                    pause;
+                }else{
                     clear;
                     printf(KGRN"\n\nFaccciamo i cunicoli per la famiglia HARTORNEN:\ndove vuoi inserire il"KMAG" %d"KGRN" cunicolo?\n", counter_h);
                     ++counter_h;
@@ -206,7 +209,8 @@ static void crea_cunicolo(){
                         printf(KRED"Ricordati che i cunicoli per entrambe le famiglie devono essere dieci!\n");
                     }
                 }
-                loading();
+                pause;
+                clear;
             break; 
         }
     }while(choice != 5);  
@@ -331,12 +335,7 @@ static int chiudi_cunicolo(){
 }
 
 int gioca(){
-    arvais.energia = 4;
-    hartornen.energia = 4;
-    arvais.raccolta = 0;
-    hartornen.raccolta = 0;
-    arvais.position = head_arvais;
-    hartornen.position = head_hartornen;
+    set(&arvais.position, &arvais, &hartornen.position, &hartornen);
     short turn;
     short count = 1;
     int choice;
@@ -352,6 +351,50 @@ int gioca(){
         }
     }
     do{
+        int s = 100;
+        if(r <= s){
+            turn = 1;
+            arvais.energia += arvais.raccolta;
+            hartornen.energia += hartornen.raccolta;
+            do{
+                clear;
+                printf(KRED"-------ARVAIS-------\n");
+                printf(KWHT"%d: \t"KRED"ENERGIA\n"KWHT"%d: \t"KRED"AMMO\n\n",arvais.energia, arvais.ammo);
+                printf(KBLU"-------HARTORNEN-------\n");
+                printf(KWHT"%d: \t"KBLU"ENERGIA\n"KWHT"%d: \t"KBLU"AMMO\n", hartornen.energia, hartornen.ammo);
+                printf(KYEL"Premere enter per sparare\n$ ");
+                getchar();
+                if(turn % 2 != 0){
+                    if(scontro_finale(&arvais)){
+                        printf(KGRN"Hai colpito HARTORNEN\n");
+                        pause;
+                        arvais.ammo -= 1;
+                        hartornen.energia -= 2;
+                    }else{ 
+                        printf(KGRN"Non hai colpito il tuo avversario\n");
+                        pause;
+                    } 
+                }else{
+                    if(scontro_finale(&hartornen)){
+                        arvais.energia -= 2;
+                        hartornen.ammo -= 1;
+                        printf(KGRN"Hai colpito ARVAIS\n");
+                        pause;
+                    }else{
+                        printf(KGRN"Non hai colpito il tuo arriversario\n");
+                        pause;
+                    }
+                }
+                if(arvais.ammo <= 0){
+                    break;
+                }else if(hartornen.ammo <= 0){
+                    break;
+                }
+                turn++;
+            }while(arvais.energia >= 0 || hartornen.energia >= 0);
+            break;
+        }
+        s += 3;
         printf(KWHT"È il turno di: \n");
         if(turn % 2 != 0){
             printf(KRED"-------ARVAIS-------\n");
@@ -362,58 +405,79 @@ int gioca(){
             printf(KWHT"%d: \t"KBLU"ENERGIA\n"KWHT"%d: \t"KBLU"RACCOLTA\n",hartornen.energia, hartornen.raccolta);
             printf(KGRN"Cosa vuoi fare HARTORNEN?\n\n");
         }
-            printf(KNRM"\t"KRED"1-"KBLU" AVANZA\n\t"KRED"2-"KBLU" ABBATTI\n\t"KRED"3-"KBLU" AGGIRA\n\t"KRED"4-"KBLU" ESCI\n"KYEL"$ ");
-            do{
-                scanf("%d", &choice);
-                if(choice != 1 && choice != 2 && choice != 3 && choice != 4){
-                    if(r <= 50){
-                        printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+        printf(KNRM"\t"KRED"1-"KBLU" AVANZA\n\t"KRED"2-"KBLU" ABBATTI\n\t"KRED"3-"KBLU" AGGIRA\n\t"KRED"4-"KBLU" ESCI\n"KYEL"$ ");
+        do{
+            scanf("%d", &choice);
+            if(choice != 1 && choice != 2 && choice != 3 && choice != 4){
+                if(r <= 50){
+                    printf(KRED"Input sbagliato, riprova\n"KYEL"$ "); 
+                }else{
+                    printf(KRED"Gli input devono essere '1' o '2' o '3' o '4', riprova\n"KYEL"$ ");
+                }
+            }    
+        }while(choice != 1 && choice != 2 && choice != 3 && choice != 4);
+
+        switch(choice){
+            case 1:
+                if(turn % 2 != 0){
+                    avanza(&arvais.position, &arvais);
+                }else{
+                    avanza(&hartornen.position, &hartornen);
+                }
+            break;
+            case 2:
+                if(turn % 2 != 0){
+                    if(arvais.position == NULL){
+                        printf(KRED"Non puoi più inserire un nuvo cunicolo\n");
                     }else{
-                        printf(KRED"Gli input devono essere '1' o '2' o '3' o '4', riprova\n"KYEL"$ ");
-                    }
-                }    
-            }while(choice != 1 && choice != 2 && choice != 3 && choice != 4);
-            switch(choice){
-                case 1:
-                    if(turn % 2 != 0){
-                        avanza(&arvais.position, &arvais);
-                    }else{
-                        avanza(&hartornen.position, &hartornen);
-                    }
-                break;
-                case 2:
-                    if(turn % 2 != 0){
                         arvais.energia--;
                         abbatti(arvais, count);
+                    }
+                }else{
+                    if(hartornen.position == NULL){
+                        printf(KRED"Non puoi più inserire un nuvo cunicolo\n");
                     }else{
                         hartornen.energia--;
                         abbatti(hartornen, count);
                     }
-                break;
-                case 3:
-                    if(turn % 2 != 0){
+                }
+            break;
+            case 3:
+                if(turn % 2 != 0){
+                    if(arvais.position == NULL){
+                        printf(KRED"Non puoi più inserire un nuvo cunicolo\n");
+                    }else{
                         aggira(arvais);
+                    }
+                }else{
+                    if(hartornen.position == NULL){
+                        printf(KRED"Non puoi più inserire un nuvo cunicolo\n");
                     }else{
                         aggira(hartornen);
                     }
-                    clear;
-                break;
-                case 4:
-                    if(turn % 2 != 0){
-                        if(arvais.position->stato == 3)
-                            esci();
-                        else{
-                            printf(KGRN"Non puoi uscire\n");
-                        }
-                    }else{
-                        if(hartornen.position->stato == 3)
-                            esci();
-                        else{
-                            printf(KGRN"Non puoi uscire\n");
-                        }
+                }
+                clear;
+            break;
+            case 4:
+                if(turn % 2 != 0){
+                    if(arvais.position->stato == 3)
+                        esci(&arvais.position, &arvais);
+                    else{
+                        printf(KGRN"Non puoi uscire\n");
                     }
-                break;
-            }        
+                }else{
+                    if(hartornen.position->stato == 3)
+                        esci(&hartornen.position, &hartornen);
+                    else{
+                        printf(KGRN"Non puoi uscire\n");
+                    }
+                }
+                free(arvais.position);
+                arvais.position = NULL;
+                free(hartornen.position);
+                hartornen.position = NULL;                   
+            break;
+        }        
         turn++;
         count++;
         int w = 3;
@@ -442,7 +506,23 @@ int gioca(){
             return w;
             printf(KYEL"IL GIOCO È FINITO IN PAREGGIO");
         }
+    }else if(arvais.energia > hartornen.energia){
+        int w = 3;
+        printf(KYEL"!!!CONGRATULAZIONI HAI VINTO TU ARVAIS!!!\n");
+        pause;    
+        return w;
+    }else if(arvais.energia < hartornen.energia){
+        int w = 3;
+        printf(KYEL"!!!CONGRATULAZIONI HAI VINTO TU HARTORNEN!!!\n");
+        pause;    
+        return w;
+    }else {
+        int w = 3;
+        printf(KYEL"!!!IL GIOCO FINISCE IN PAREGGIO!!!\n");
+        pause;    
+        return w;
     }
+
     return 0;
 }
 
@@ -479,7 +559,7 @@ static void avanza(Cave_t **cave, Scava_t *player){
                 }
             }    
         }while(s != 1 && s != 2);
-    }else printf(KGRN"Non c'è melassa nella cunicolo\n");
+    }else printf(KGRN"Non c'è melassa nel cunicolo\n");
 
     if(s == 1){
         player->energia += (*cave)->melassa;
@@ -741,7 +821,21 @@ static void aggira(Scava_t player){
     }
 }
 
-static void esci(Scava_t player){
-    printf("hello\n");
-    
+static void esci(Cave_t **cave, Scava_t *player){
+    clear;
+    pause;
+    printf(KNRM"GAME OVER\n");
+    free(head_arvais);
+    head_arvais = NULL;
+    free(head_hartornen);
+    head_hartornen = NULL;
+}
+
+static bool scontro_finale(Scava_t*player){
+    if(r <= 50){
+        return true;
+    }else{
+        return false;
+
+    }    
 }

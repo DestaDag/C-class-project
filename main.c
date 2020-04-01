@@ -1,7 +1,6 @@
 /*
     DESTA DAGIM AYENEW
     MATRICOLA: 314650
-    v: 0.1.0
 */
 
 #include "gamelib.h"

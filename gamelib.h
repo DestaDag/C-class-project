@@ -1,7 +1,6 @@
 /*
     DESTA DAGIM AYENEW
     MATRICOLA: 314650
-    v: 0.1.0
 */
 
 #include <stdio.h>
@@ -58,7 +57,8 @@ struct Caverna{
 struct Scavatrice{
     struct Caverna* position;
     int energia;
-    int raccolta; 
+    int raccolta;
+    int ammo;
 };
 
 typedef struct Caverna Cave_t;
