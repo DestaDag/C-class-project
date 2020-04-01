@@ -1,1 +1,1 @@
-# Progetto2019
+C terminal app assigned as class project
