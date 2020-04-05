@@ -11,6 +11,7 @@
 #include <math.h>
 #include <unistd.h>
 
+//define macros
 #define pause  sleep(2)
 #define clear  printf("\e[1;1H\e[2J")
 #define KNRM  "\x1B[0m"

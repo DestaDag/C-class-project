@@ -19,7 +19,6 @@ int main(){
             check = gioca();
         if(check == 3)
             break;
-
     } while (1);
     
 }

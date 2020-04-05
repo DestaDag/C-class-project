@@ -20,7 +20,7 @@ static void abbatti_cunicolo(Cave_t **head, short count, int t);// adds nodes wi
 static void aggira(Scava_t player); //adds a node if the node gets destroyed
 static void esci(Cave_t **cave, Scava_t *player);//player exit the cave structure
 static void ins_cunicolo(Cave_t **head, int t); //adds a node
-static void canc_caverna(Cave_t **head, int t); //deletes a nodes
+static void canc_caverna(Cave_t **head); //deletes a nodes
 static bool scontro_finale(Scava_t*player); //handles the final battle
 static void set(Cave_t **cave, Scava_t*player, Cave_t **cave2, Scava_t*player2); //sets default values
 // to check if creating map is done
@@ -182,10 +182,10 @@ static void crea_cunicolo(){
                 }while(x != 1 && x != 2 && x != 3);
             
                 if(x == 1){
-                    canc_caverna(&head_arvais, x);
+                    canc_caverna(&head_arvais);
                     delete_check = false;
                 }else{
-                    canc_caverna(&head_hartornen, x);
+                    canc_caverna(&head_hartornen);
                     delete_check = true; 
                 }    
             break;
@@ -287,7 +287,7 @@ static void stampa_cunicolo(Cave_t *first){
     }
 }
 
-static void canc_caverna(Cave_t **head, int t){
+static void canc_caverna(Cave_t **head){
     Cave_t* first = *head;
     if(*head == NULL){
         printf(KRED"Non c'e` un cunicolo da eliminare");
@@ -351,8 +351,10 @@ int gioca(){
         }
     }
     do{
-        int s = 100;
+        int s = 3;
         if(r <= s){
+            clear;
+            printf(KGRN"Vi siete Sbattuti nella stessa caverna, dovete combattere 1v1!!!");
             turn = 1;
             arvais.energia += arvais.raccolta;
             hartornen.energia += hartornen.raccolta;
